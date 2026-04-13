@@ -5,6 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CHAMPII — Annual Fitness & Keto Planner</title>
 <meta name="description" content="Plan anual personalizado: Calistenia, Pilates y Dieta Keto con seguimiento de progreso y IMC.">
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f1d2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CHAMPII">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <style>
@@ -13,7 +21,8 @@
 ═══════════════════════════════════════ */
 :root {
   --sidebar-w: 240px;
-  --header-h: 60px;
+  --header-h: 56px;
+  --bottom-nav-h: 64px;
   --bg: #f0f4f8;
   --bg-card: #ffffff;
   --sidebar-bg: #0f1d2e;
@@ -125,17 +134,68 @@ body{
 
 /* mobile toggle */
 .mobile-toggle{
-  display:none;position:fixed;top:12px;left:12px;z-index:300;
-  width:42px;height:42px;border-radius:var(--radius-sm);
+  display:none;position:fixed;top:8px;left:10px;z-index:300;
+  width:40px;height:40px;border-radius:var(--radius-sm);
   background:var(--sidebar-bg);border:none;color:#fff;
   font-size:20px;cursor:pointer;
   box-shadow:var(--shadow-md);
   align-items:center;justify-content:center;
+  -webkit-tap-highlight-color:transparent;
 }
 .mobile-overlay{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,.4);z-index:190;
 }
+
+/* ═══════════════════════════════════════
+   BOTTOM NAV (mobile only)
+═══════════════════════════════════════ */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  height:var(--bottom-nav-h);
+  background:var(--sidebar-bg);
+  border-top:1px solid rgba(255,255,255,.08);
+  z-index:200;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.bottom-nav-inner{
+  display:flex;height:100%;align-items:stretch;
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:3px;cursor:pointer;
+  border:none;background:none;
+  color:rgba(255,255,255,.45);
+  font-family:inherit;font-size:9px;font-weight:600;
+  letter-spacing:.5px;text-transform:uppercase;
+  transition:var(--trans);
+  -webkit-tap-highlight-color:transparent;
+  padding:4px 0;
+}
+.bnav-item .bnav-icon{font-size:20px;line-height:1}
+.bnav-item.active{color:var(--primary)}
+.bnav-item.active .bnav-icon{
+  filter:drop-shadow(0 0 6px rgba(37,99,235,.6));
+}
+.bnav-more-panel{
+  display:none;position:fixed;bottom:var(--bottom-nav-h);left:0;right:0;
+  background:var(--sidebar-bg);border-top:1px solid rgba(255,255,255,.08);
+  padding:12px;z-index:199;
+  grid-template-columns:repeat(3,1fr);gap:8px;
+}
+.bnav-more-panel.open{display:grid}
+.bnav-more-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:12px 8px;border-radius:var(--radius-sm);
+  border:none;background:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.7);font-family:inherit;
+  font-size:10px;font-weight:600;letter-spacing:.5px;
+  text-transform:uppercase;cursor:pointer;
+  transition:var(--trans);
+}
+.bnav-more-btn:hover,.bnav-more-btn:active{background:rgba(255,255,255,.12)}
+.bnav-more-btn .bnav-icon{font-size:22px}
 
 /* ═══════════════════════════════════════
    MAIN CONTENT
@@ -149,22 +209,32 @@ body{
   background:var(--bg-card);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between;
-  padding:0 28px;
+  padding:0 24px;
   position:sticky;top:0;z-index:100;
+  gap:12px;
 }
-.topbar-left{display:flex;flex-direction:column}
-.topbar-title{font-weight:700;font-size:16px;color:var(--text)}
+.topbar-left{display:flex;flex-direction:column;min-width:0;flex:1}
+.topbar-title{font-weight:700;font-size:15px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .topbar-date{font-size:11px;color:var(--text3)}
-.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
 .topbar-btn{
   background:var(--bg);border:1px solid var(--border);
-  padding:7px 14px;border-radius:var(--radius-sm);
+  padding:7px 12px;border-radius:var(--radius-sm);
   font-family:inherit;font-size:12px;color:var(--text2);
   cursor:pointer;transition:var(--trans);display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
 }
 .topbar-btn:hover{border-color:var(--primary);color:var(--primary)}
+.install-btn{
+  background:var(--primary);color:#fff;border:none;
+  padding:7px 12px;border-radius:var(--radius-sm);
+  font-family:inherit;font-size:12px;font-weight:700;
+  cursor:pointer;transition:var(--trans);display:flex;align-items:center;gap:5px;
+  white-space:nowrap;
+}
+.install-btn:hover{background:var(--primary-dark)}
 
-.content{padding:24px 28px;max-width:1200px}
+.content{padding:20px 24px;max-width:1200px}
 
 /* ═══════════════════════════════════════
    VIEWS
@@ -409,22 +479,52 @@ body{
    RESPONSIVE
 ═══════════════════════════════════════ */
 @media(max-width:768px){
-  :root{--sidebar-w:260px}
+  :root{ --sidebar-w:280px; --header-h:56px }
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
   .mobile-toggle{display:flex}
   .mobile-overlay.show{display:block}
-  .main{margin-left:0}
-  .topbar{padding:0 16px;padding-left:56px}
-  .content{padding:16px}
+  .main{margin-left:0;padding-bottom:var(--bottom-nav-h)}
+  .topbar{padding:0 12px;padding-left:58px}
+  .topbar-title{font-size:14px}
+  .topbar-right .topbar-btn,.topbar-right .install-btn{display:none}
+  .content{padding:12px;padding-bottom:calc(var(--bottom-nav-h) + 12px)}
   .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
   .progress-grid,.profile-grid{grid-template-columns:1fr}
   .macro-bar{grid-template-columns:repeat(3,1fr);gap:8px}
   .cal-day{font-size:11px}
+  .bottom-nav{display:block}
+  /* Dashboard grid single column */
+  #dashGrid{grid-template-columns:1fr !important}
+  /* Nutrition food grid single column */
+  #foodGrid{grid-template-columns:1fr !important}
+  /* Cards tighter */
+  .card{padding:16px;margin-bottom:12px}
+  .stat-card{padding:14px 12px}
+  .stat-val{font-size:22px}
+  /* Exercise items more touch-friendly */
+  .ex-item{padding:14px 12px}
+  .ex-check{width:28px;height:28px;border-radius:8px;font-size:14px}
+  /* Modal full width on mobile */
+  .modal{padding:24px 20px}
+  /* Calendar smaller */
+  .cal-day{font-size:10px;padding:2px}
+  .cal-day-header{font-size:9px}
 }
-@media(max-width:420px){
-  .stats-row{grid-template-columns:1fr 1fr}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px}
   .food-grid{grid-template-columns:repeat(2,1fr)}
+  .macro-bar{gap:6px}
+  .macro-item{padding:10px 6px}
+  .macro-val{font-size:18px}
+  .ex-detail{font-size:10px;gap:6px}
+  .card-header{flex-direction:column;align-items:flex-start;gap:6px}
+  .topbar-title{font-size:13px}
+}
+@media(max-width:360px){
+  .stats-row{grid-template-columns:1fr 1fr;gap:6px}
+  .stat-val{font-size:20px}
+  .content{padding:10px}
 }
 
 /* Scrollbar */
@@ -485,6 +585,44 @@ body{
 <button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">☰</button>
 <div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
 
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottomNav">
+  <div class="bnav-more-panel" id="bnavMorePanel">
+    <button class="bnav-more-btn" onclick="bnavGo('calendar')">
+      <span class="bnav-icon">📅</span>Calendario
+    </button>
+    <button class="bnav-more-btn" onclick="bnavGo('pilates')">
+      <span class="bnav-icon">🧘</span>Pilates
+    </button>
+    <button class="bnav-more-btn" onclick="bnavGo('progress')">
+      <span class="bnav-icon">📈</span>Progreso
+    </button>
+    <button class="bnav-more-btn" onclick="bnavGo('profile')">
+      <span class="bnav-icon">👤</span>Perfil
+    </button>
+    <button class="bnav-more-btn" onclick="exportData()">
+      <span class="bnav-icon">⬇</span>Backup
+    </button>
+    <button class="bnav-more-btn" onclick="document.getElementById('importFile').click()">
+      <span class="bnav-icon">⬆</span>Importar
+    </button>
+  </div>
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" id="bnav-dashboard" onclick="bnavGo('dashboard')">
+      <span class="bnav-icon">📊</span>Inicio
+    </button>
+    <button class="bnav-item" id="bnav-exercises" onclick="bnavGo('exercises')">
+      <span class="bnav-icon">💪</span>Ejercicios
+    </button>
+    <button class="bnav-item" id="bnav-nutrition" onclick="bnavGo('nutrition')">
+      <span class="bnav-icon">🥑</span>Keto
+    </button>
+    <button class="bnav-item" id="bnav-more" onclick="toggleBnavMore()">
+      <span class="bnav-icon">⋯</span>Más
+    </button>
+  </div>
+</nav>
+
 <!-- MAIN -->
 <div class="main">
   <div class="topbar">
@@ -493,6 +631,7 @@ body{
       <div class="topbar-date" id="topDate"></div>
     </div>
     <div class="topbar-right">
+      <button class="install-btn" id="installBtn" onclick="installApp()">📲 Instalar App</button>
       <button class="topbar-btn" onclick="exportData()">⬇ Backup</button>
       <button class="topbar-btn" onclick="document.getElementById('importFile').click()">⬆ Importar</button>
       <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
@@ -1183,6 +1322,10 @@ function showView(id){
   document.querySelector(`[data-view="${id}"]`)?.classList.add('active');
   document.getElementById('topTitle').textContent = viewTitles[id] || id;
   closeSidebar();
+  // sync bottom nav
+  const bnavMap = {dashboard:'dashboard',exercises:'exercises',nutrition:'nutrition'};
+  document.querySelectorAll('.bnav-item:not(#bnav-more)').forEach(b => b.classList.remove('active'));
+  if(bnavMap[id]) document.getElementById('bnav-'+id)?.classList.add('active');
   if(id === 'dashboard') renderDashboard();
   if(id === 'calendar') renderCalendar();
   if(id === 'exercises') renderExercises();
@@ -1202,6 +1345,16 @@ function toggleSidebar(){
 function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('mobileOverlay').classList.remove('show');
+}
+function toggleBnavMore(){
+  const p = document.getElementById('bnavMorePanel');
+  p.classList.toggle('open');
+  document.getElementById('bnav-more').classList.toggle('active');
+}
+function bnavGo(id){
+  document.getElementById('bnavMorePanel')?.classList.remove('open');
+  document.getElementById('bnav-more')?.classList.remove('active');
+  showView(id);
 }
 
 /* ═══════════════════════════════════════
@@ -1970,6 +2123,53 @@ function init(){
 }
 
 init();
+
+/* ═══════════════════════════════════════
+   PWA — SERVICE WORKER & INSTALL
+═══════════════════════════════════════ */
+let deferredInstallPrompt = null;
+
+// Register service worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registrado:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Capture the install prompt before it fires
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Show install button
+  const btn = document.getElementById('installBtn');
+  if(btn) btn.classList.add('visible');
+});
+
+// When app is installed, hide the button
+window.addEventListener('appinstalled', () => {
+  deferredInstallPrompt = null;
+  const btn = document.getElementById('installBtn');
+  if(btn) btn.classList.remove('visible');
+  toast('🎉 ¡App instalada correctamente!');
+});
+
+function installApp(){
+  if(!deferredInstallPrompt){
+    // iOS Safari fallback instructions
+    alert('Para instalar en iPhone/iPad:\n\n1. Toca el botón Compartir (□↑) en Safari\n2. Selecciona "Agregar a pantalla de inicio"\n3. Toca "Agregar"\n\n¡Listo! Tendrás el ícono CHAMPII en tu celular.');
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(choice => {
+    if(choice.outcome === 'accepted'){
+      toast('🎉 ¡Instalando CHAMPII...');
+    }
+    deferredInstallPrompt = null;
+    document.getElementById('installBtn').classList.remove('visible');
+  });
+}
 </script>
 </body>
 </html>
