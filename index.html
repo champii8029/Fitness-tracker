@@ -1,0 +1,1975 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CHAMPII — Annual Fitness & Keto Planner</title>
+<meta name="description" content="Plan anual personalizado: Calistenia, Pilates y Dieta Keto con seguimiento de progreso y IMC.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════ */
+:root {
+  --sidebar-w: 240px;
+  --header-h: 60px;
+  --bg: #f0f4f8;
+  --bg-card: #ffffff;
+  --sidebar-bg: #0f1d2e;
+  --sidebar-hover: #162a42;
+  --sidebar-active: #1e3a5f;
+  --primary: #2563eb;
+  --primary-light: #dbeafe;
+  --primary-dark: #1d4ed8;
+  --success: #059669;
+  --success-light: #d1fae5;
+  --success-bg: #ecfdf5;
+  --warning: #d97706;
+  --warning-light: #fef3c7;
+  --danger: #dc2626;
+  --danger-light: #fee2e2;
+  --purple: #7c3aed;
+  --purple-light: #ede9fe;
+  --teal: #0d9488;
+  --teal-light: #ccfbf1;
+  --orange: #ea580c;
+  --orange-light: #fff7ed;
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.07), 0 2px 4px -2px rgba(0,0,0,.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,.08), 0 4px 6px -4px rgba(0,0,0,.05);
+  --trans: .2s ease;
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════ */
+.sidebar{
+  position:fixed;left:0;top:0;bottom:0;
+  width:var(--sidebar-w);
+  background:var(--sidebar-bg);
+  z-index:200;
+  display:flex;flex-direction:column;
+  transition:transform .3s ease;
+}
+.sidebar-brand{
+  padding:20px 18px;
+  display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.brand-icon{
+  width:38px;height:38px;border-radius:10px;
+  background:linear-gradient(135deg,var(--primary),#7c3aed);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:900;color:#fff;
+  flex-shrink:0;
+}
+.brand-text{display:flex;flex-direction:column}
+.brand-name{font-weight:800;color:#fff;font-size:15px;letter-spacing:1px}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase}
+
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-section{
+  padding:6px 18px;font-size:10px;letter-spacing:2px;
+  text-transform:uppercase;color:rgba(255,255,255,.25);
+  margin-top:14px;margin-bottom:4px;
+}
+.nav-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 18px;margin:2px 8px;
+  border-radius:var(--radius-sm);
+  color:rgba(255,255,255,.55);
+  cursor:pointer;transition:var(--trans);
+  font-size:13px;font-weight:500;
+  text-decoration:none;
+  border:none;background:none;width:calc(100% - 16px);
+  text-align:left;
+}
+.nav-item:hover{background:var(--sidebar-hover);color:rgba(255,255,255,.85)}
+.nav-item.active{background:var(--primary);color:#fff;font-weight:600;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.nav-icon{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+
+.sidebar-user{
+  padding:16px 18px;
+  border-top:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.user-avatar{
+  width:34px;height:34px;border-radius:50%;
+  background:linear-gradient(135deg,var(--success),var(--teal));
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.user-info{display:flex;flex-direction:column}
+.user-name{color:#fff;font-weight:600;font-size:13px}
+.user-role{color:rgba(255,255,255,.35);font-size:10px;letter-spacing:1px}
+
+/* mobile toggle */
+.mobile-toggle{
+  display:none;position:fixed;top:12px;left:12px;z-index:300;
+  width:42px;height:42px;border-radius:var(--radius-sm);
+  background:var(--sidebar-bg);border:none;color:#fff;
+  font-size:20px;cursor:pointer;
+  box-shadow:var(--shadow-md);
+  align-items:center;justify-content:center;
+}
+.mobile-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.4);z-index:190;
+}
+
+/* ═══════════════════════════════════════
+   MAIN CONTENT
+═══════════════════════════════════════ */
+.main{
+  margin-left:var(--sidebar-w);
+  min-height:100vh;
+}
+.topbar{
+  height:var(--header-h);
+  background:var(--bg-card);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 28px;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-left{display:flex;flex-direction:column}
+.topbar-title{font-weight:700;font-size:16px;color:var(--text)}
+.topbar-date{font-size:11px;color:var(--text3)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.topbar-btn{
+  background:var(--bg);border:1px solid var(--border);
+  padding:7px 14px;border-radius:var(--radius-sm);
+  font-family:inherit;font-size:12px;color:var(--text2);
+  cursor:pointer;transition:var(--trans);display:flex;align-items:center;gap:5px;
+}
+.topbar-btn:hover{border-color:var(--primary);color:var(--primary)}
+
+.content{padding:24px 28px;max-width:1200px}
+
+/* ═══════════════════════════════════════
+   VIEWS
+═══════════════════════════════════════ */
+.view{display:none;animation:fadeIn .3s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══════════════════════════════════════
+   CARDS
+═══════════════════════════════════════ */
+.card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:20px;margin-bottom:16px;
+  transition:var(--trans);
+}
+.card:hover{box-shadow:var(--shadow-md)}
+.card-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:16px;
+}
+.card-title{font-weight:700;font-size:14px;color:var(--text);display:flex;align-items:center;gap:8px}
+.card-badge{
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  padding:3px 10px;border-radius:20px;
+}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{
+  background:var(--bg-card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px 16px;
+  box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+  transition:var(--trans);
+}
+.stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--stat-color,var(--primary));
+}
+.stat-icon{
+  width:36px;height:36px;border-radius:var(--radius-sm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;margin-bottom:10px;
+}
+.stat-val{font-size:26px;font-weight:800;line-height:1;margin-bottom:3px;color:var(--text)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.stat-change{font-size:11px;margin-top:6px;font-weight:600}
+
+/* ═══════════════════════════════════════
+   TODAY'S ROUTINE
+═══════════════════════════════════════ */
+.routine-type{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 14px;border-radius:20px;font-size:12px;font-weight:700;
+  letter-spacing:.5px;margin-bottom:14px;
+}
+.exercise-list{display:flex;flex-direction:column;gap:6px}
+.ex-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+  transition:var(--trans);cursor:pointer;
+  position:relative;
+}
+.ex-item:hover{border-color:var(--primary);background:var(--primary-light)}
+.ex-item.completed{background:var(--success-bg);border-color:var(--success)}
+.ex-item.completed .ex-name{text-decoration:line-through;color:var(--text3)}
+.ex-item.skipped{background:#fef2f2;border-color:var(--danger);opacity:.6}
+.ex-item.current{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light);background:#f0f5ff}
+.ex-item.current::before{
+  content:'▶';position:absolute;left:-22px;
+  color:var(--primary);font-size:10px;animation:pulse 1.5s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+.ex-check{
+  width:24px;height:24px;border-radius:6px;
+  border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:900;flex-shrink:0;
+  cursor:pointer;transition:var(--trans);
+  background:#fff;
+}
+.ex-check:hover{border-color:var(--primary)}
+.ex-item.completed .ex-check{background:var(--success);border-color:var(--success);color:#fff}
+.ex-item.skipped .ex-check{background:var(--danger);border-color:var(--danger);color:#fff}
+
+.ex-body{flex:1;min-width:0}
+.ex-name{font-weight:600;font-size:13px;margin-bottom:2px}
+.ex-detail{font-size:11px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap}
+.ex-detail span{display:flex;align-items:center;gap:3px}
+.ex-note{font-size:11px;color:var(--warning);margin-top:3px;font-style:italic}
+
+/* ═══════════════════════════════════════
+   NUTRITION
+═══════════════════════════════════════ */
+.macro-bar{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.macro-item{
+  text-align:center;padding:14px 10px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+}
+.macro-val{font-size:22px;font-weight:800;margin-bottom:2px}
+.macro-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600}
+.macro-pct{font-size:11px;color:var(--text2);margin-top:2px}
+
+.meal-card{
+  padding:14px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);margin-bottom:10px;
+}
+.meal-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.meal-time{font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.meal-name{font-weight:600;font-size:14px}
+.meal-desc{font-size:12px;color:var(--text2);line-height:1.6}
+.meal-macros{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap}
+.meal-macro{font-size:10px;padding:3px 8px;border-radius:12px;font-weight:600}
+
+.food-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.food-tag{
+  padding:8px 12px;border-radius:var(--radius-sm);
+  font-size:12px;font-weight:500;text-align:center;
+  border:1px solid var(--border);
+  transition:var(--trans);
+}
+.food-tag.allowed{background:var(--success-bg);border-color:#a7f3d0;color:#065f46}
+.food-tag.forbidden{background:#fef2f2;border-color:#fecaca;color:#991b1b;text-decoration:line-through}
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+.cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.cal-nav{display:flex;align-items:center;gap:12px}
+.cal-nav-btn{
+  width:32px;height:32px;border-radius:var(--radius-sm);
+  background:var(--bg);border:1px solid var(--border);
+  cursor:pointer;font-size:14px;transition:var(--trans);
+  display:flex;align-items:center;justify-content:center;
+}
+.cal-nav-btn:hover{border-color:var(--primary);color:var(--primary)}
+.cal-month{font-weight:700;font-size:16px;min-width:160px;text-align:center}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day-header{
+  text-align:center;font-size:10px;font-weight:700;
+  color:var(--text3);text-transform:uppercase;letter-spacing:1px;
+  padding:8px 0;
+}
+.cal-day{
+  aspect-ratio:1;border-radius:var(--radius-sm);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:13px;font-weight:500;cursor:pointer;
+  transition:var(--trans);border:1px solid transparent;
+  position:relative;gap:3px;
+}
+.cal-day:hover{background:var(--primary-light);border-color:var(--primary)}
+.cal-day.today{border-color:var(--primary);background:var(--primary-light);font-weight:700}
+.cal-day.done{background:var(--success-bg)}
+.cal-day.done::after{content:'✓';font-size:8px;color:var(--success);font-weight:900}
+.cal-day.empty{pointer-events:none}
+.cal-day.selected{background:var(--primary);color:#fff;font-weight:700}
+.cal-day-type{font-size:7px;font-weight:700;letter-spacing:.5px;color:var(--text3);text-transform:uppercase}
+.cal-day.done .cal-day-type,.cal-day.selected .cal-day-type{color:inherit;opacity:.7}
+
+/* ═══════════════════════════════════════
+   PROGRESS
+═══════════════════════════════════════ */
+.chart-wrap{position:relative;height:260px;margin-bottom:10px}
+.progress-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* ═══════════════════════════════════════
+   PROFILE
+═══════════════════════════════════════ */
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.input-group{margin-bottom:14px}
+.input-label{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:block}
+.input-field{
+  width:100%;padding:10px 14px;
+  border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-family:inherit;font-size:14px;color:var(--text);
+  background:var(--bg);transition:var(--trans);
+  outline:none;
+}
+.input-field:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.btn{
+  padding:10px 20px;border-radius:var(--radius-sm);
+  font-family:inherit;font-size:13px;font-weight:700;
+  cursor:pointer;transition:var(--trans);border:none;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark);box-shadow:0 4px 12px rgba(37,99,235,.25)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-outline:hover{border-color:var(--primary);color:var(--primary)}
+.btn-success{background:var(--success);color:#fff}
+.btn-success:hover{background:#047857}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+  z-index:999;background:var(--sidebar-bg);color:#fff;
+  border-radius:var(--radius);padding:14px 24px;
+  font-size:13px;font-weight:600;
+  box-shadow:var(--shadow-lg);
+  transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .3s ease;
+  opacity:0;display:flex;align-items:center;gap:10px;max-width:90%;
+}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+
+/* ═══════════════════════════════════════
+   CONGRATS MODAL
+═══════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:500;
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--bg-card);border-radius:16px;
+  padding:32px;text-align:center;max-width:380px;width:100%;
+  box-shadow:var(--shadow-lg);animation:modalIn .4s ease;
+}
+@keyframes modalIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-emoji{font-size:60px;margin-bottom:12px;display:block}
+.modal-title{font-weight:800;font-size:20px;margin-bottom:6px}
+.modal-text{color:var(--text2);font-size:13px;margin-bottom:18px;line-height:1.6}
+.modal-next{
+  background:var(--primary-light);border-radius:var(--radius-sm);
+  padding:12px 16px;margin-bottom:16px;font-size:13px;
+  border:1px solid var(--primary);color:var(--primary);font-weight:600;
+}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:768px){
+  :root{--sidebar-w:260px}
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .mobile-toggle{display:flex}
+  .mobile-overlay.show{display:block}
+  .main{margin-left:0}
+  .topbar{padding:0 16px;padding-left:56px}
+  .content{padding:16px}
+  .stats-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .progress-grid,.profile-grid{grid-template-columns:1fr}
+  .macro-bar{grid-template-columns:repeat(3,1fr);gap:8px}
+  .cal-day{font-size:11px}
+}
+@media(max-width:420px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .food-grid{grid-template-columns:repeat(2,1fr)}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.sidebar::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1)}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="brand-icon">C</div>
+    <div class="brand-text">
+      <span class="brand-name">CHAMPII</span>
+      <span class="brand-sub">Health Planner</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">Principal</div>
+    <button class="nav-item active" onclick="showView('dashboard')" data-view="dashboard">
+      <span class="nav-icon">📊</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showView('calendar')" data-view="calendar">
+      <span class="nav-icon">📅</span> Calendario
+    </button>
+    <div class="nav-section">Entrenamiento</div>
+    <button class="nav-item" onclick="showView('exercises')" data-view="exercises">
+      <span class="nav-icon">💪</span> Ejercicios
+    </button>
+    <button class="nav-item" onclick="showView('pilates')" data-view="pilates">
+      <span class="nav-icon">🧘</span> Pilates
+    </button>
+    <div class="nav-section">Nutrición</div>
+    <button class="nav-item" onclick="showView('nutrition')" data-view="nutrition">
+      <span class="nav-icon">🥑</span> Dieta Keto
+    </button>
+    <div class="nav-section">Seguimiento</div>
+    <button class="nav-item" onclick="showView('progress')" data-view="progress">
+      <span class="nav-icon">📈</span> Progreso
+    </button>
+    <button class="nav-item" onclick="showView('profile')" data-view="profile">
+      <span class="nav-icon">👤</span> Perfil
+    </button>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">CH</div>
+    <div class="user-info">
+      <span class="user-name">Champii</span>
+      <span class="user-role">ATHLETE</span>
+    </div>
+  </div>
+</aside>
+
+<!-- Mobile Toggle -->
+<button class="mobile-toggle" id="mobileToggle" onclick="toggleSidebar()">☰</button>
+<div class="mobile-overlay" id="mobileOverlay" onclick="toggleSidebar()"></div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-title" id="topTitle">Dashboard</div>
+      <div class="topbar-date" id="topDate"></div>
+    </div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="exportData()">⬇ Backup</button>
+      <button class="topbar-btn" onclick="document.getElementById('importFile').click()">⬆ Importar</button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+      <button class="topbar-btn" onclick="copySyncCode()">🔗 Sync</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ═══════ DASHBOARD ═══════ -->
+    <div class="view active" id="v-dashboard">
+      <div class="stats-row" id="statsRow"></div>
+
+      <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:16px" id="dashGrid">
+        <!-- Today's Routine -->
+        <div class="card" id="todayRoutineCard">
+          <div class="card-header">
+            <div class="card-title">🏋️ Rutina de Hoy</div>
+            <span class="card-badge" id="todayTypeBadge" style="background:var(--primary-light);color:var(--primary)"></span>
+          </div>
+          <div id="todayRoutine"></div>
+        </div>
+
+        <!-- Quick Info -->
+        <div>
+          <div class="card" id="bmiCard">
+            <div class="card-header">
+              <div class="card-title">📐 IMC Actual</div>
+            </div>
+            <div id="bmiDisplay"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🥑 Macros del Día</div>
+            </div>
+            <div class="macro-bar" id="dashMacros"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">🏆 Racha</div>
+            </div>
+            <div id="streakDisplay"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ CALENDAR ═══════ -->
+    <div class="view" id="v-calendar">
+      <div class="card">
+        <div class="cal-header">
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">◀</button>
+            <div class="cal-month" id="calMonth"></div>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">▶</button>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span class="card-badge" style="background:var(--primary-light);color:var(--primary)">💪 Calistenia</span>
+            <span class="card-badge" style="background:var(--purple-light);color:var(--purple)">🧘 Pilates</span>
+            <span class="card-badge" style="background:var(--teal-light);color:var(--teal)">😴 Descanso</span>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+      <div class="card" id="calDayDetail" style="display:none">
+        <div id="calDayContent"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ EXERCISES ═══════ -->
+    <div class="view" id="v-exercises">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">💪 Calistenia — Peso Corporal</div>
+          <span class="card-badge" id="exPhaseBadge" style="background:var(--primary-light);color:var(--primary)"></span>
+        </div>
+        <p style="color:var(--text2);font-size:13px;margin-bottom:16px" id="exPhaseDesc"></p>
+        <div id="exercisePanel"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PILATES ═══════ -->
+    <div class="view" id="v-pilates">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🧘 Pilates & Estabilidad</div>
+          <span class="card-badge" id="pilatesPhaseBadge" style="background:var(--purple-light);color:var(--purple)"></span>
+        </div>
+        <p style="color:var(--text2);font-size:13px;margin-bottom:16px" id="pilatesPhaseDesc"></p>
+        <div id="pilatesPanel"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ NUTRITION ═══════ -->
+    <div class="view" id="v-nutrition">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🥑 Plan Keto Diario</div>
+          <span class="card-badge" style="background:var(--success-light);color:var(--success)">70F / 25P / 5C</span>
+        </div>
+        <div class="macro-bar" id="ketoMacros"></div>
+        <div id="mealPlan"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px" id="foodGrid">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:var(--success)">✅ Alimentos Permitidos</div>
+          </div>
+          <div class="food-grid" id="allowedFoods"></div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" style="color:var(--danger)">🚫 Alimentos Prohibidos</div>
+          </div>
+          <div class="food-grid" id="forbiddenFoods"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════ PROGRESS ═══════ -->
+    <div class="view" id="v-progress">
+      <div class="stats-row" id="progressStats"></div>
+      <div class="progress-grid">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">⚖️ Tendencia de Peso</div>
+          <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px">📈 Ejercicios Completados</div>
+          <div class="chart-wrap"><canvas id="exChart"></canvas></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title" style="margin-bottom:12px">📋 Historial de Registros</div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <!-- ═══════ PROFILE ═══════ -->
+    <div class="view" id="v-profile">
+      <div class="profile-grid">
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">👤 Datos Personales</div>
+          <div class="input-group">
+            <label class="input-label">Nombre</label>
+            <input class="input-field" id="profName" value="Champii">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Peso actual (kg)</label>
+            <input class="input-field" type="number" step="0.1" id="profWeight" placeholder="152.0" inputmode="decimal">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Altura (cm)</label>
+            <input class="input-field" type="number" id="profHeight" placeholder="182" inputmode="numeric">
+          </div>
+          <div class="input-group">
+            <label class="input-label">Meta de peso (kg)</label>
+            <input class="input-field" type="number" step="0.1" id="profGoal" placeholder="95.0" inputmode="decimal">
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">💾 Guardar Perfil</button>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:16px">📐 Tu IMC</div>
+          <div id="profileBMI"></div>
+          <div style="margin-top:20px">
+            <div class="card-title" style="margin-bottom:12px">📊 Datos del Sistema</div>
+            <div style="font-size:12px;color:var(--text2);line-height:2">
+              <div>📅 Inicio del plan: <strong id="profStart"></strong></div>
+              <div>📆 Días transcurridos: <strong id="profDays"></strong></div>
+              <div>🏋️ Fase actual: <strong id="profPhase"></strong></div>
+              <div>💾 Registros guardados: <strong id="profRecords"></strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- CONGRATS MODAL -->
+<div class="modal-overlay" id="congratsModal">
+  <div class="modal">
+    <span class="modal-emoji" id="modalEmoji">🎉</span>
+    <div class="modal-title" id="modalTitle">¡Excelente trabajo!</div>
+    <div class="modal-text" id="modalText"></div>
+    <div class="modal-next" id="modalNext" style="display:none"></div>
+    <button class="btn btn-primary" onclick="closeModal()">¡Vamos! 💪</button>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════
+   CONSTANTS
+═══════════════════════════════════════ */
+const START_DATE = new Date(2026, 3, 13); // April 13, 2026
+const STORAGE_KEY = 'champii_annual_v1';
+const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS_ES = ['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'];
+const DAYS_FULL = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+
+/* ═══════════════════════════════════════
+   EXERCISE DATABASE (6 Phases)
+═══════════════════════════════════════ */
+const CALISTHENICS = {
+  // Phase 1-6: each has push, pull, legs, fullbody
+  1: { name:'Fundamentos', desc:'Movimientos básicos, aprendiendo la forma correcta. Sin prisa.',
+    push:[
+      {nombre:'Wall Push-up',series:3,reps:'12',tempo:'2-1-2',descanso:'60s',nota:'Espalda recta, core activado'},
+      {nombre:'Push-up en Rodillas',series:3,reps:'8',tempo:'2-1-2',descanso:'60s',nota:'Bajar hasta 90° en codos'},
+      {nombre:'Pike Push-up (asistido)',series:2,reps:'6',tempo:'2-1-2',descanso:'75s',nota:'Caderas arriba, hombros trabajan'},
+      {nombre:'Dips en Silla',series:3,reps:'8',tempo:'2-0-2',descanso:'60s',nota:'Codos atrás, no hundir hombros'},
+    ],
+    pull:[
+      {nombre:'Row Invertido en Mesa',series:3,reps:'8',tempo:'2-1-2',descanso:'75s',nota:'Cuerpo rígido como tabla'},
+      {nombre:'Chin-up Negativo',series:3,reps:'4',tempo:'5s bajada',descanso:'90s',nota:'Solo la bajada, muy lento'},
+      {nombre:'Superman Hold',series:3,reps:'10',tempo:'3s hold',descanso:'60s',nota:'Elevar brazos y piernas suavemente'},
+    ],
+    legs:[
+      {nombre:'Sentadilla Asistida',series:3,reps:'12',tempo:'2-1-2',descanso:'60s',nota:'Agarra una silla para balance'},
+      {nombre:'Wall Sit',series:3,reps:'20s',tempo:'Hold',descanso:'60s',nota:'Espalda plana en pared, 90°'},
+      {nombre:'Step-up en Escalón',series:3,reps:'10 c/l',tempo:'2-0-2',descanso:'60s',nota:'Sin carga extra'},
+      {nombre:'Calf Raises',series:3,reps:'15',tempo:'2-1-2',descanso:'45s',nota:'Apóyate en pared si necesitas'},
+      {nombre:'Glute Bridge',series:3,reps:'15',tempo:'2-1-2',descanso:'45s',nota:'Apretar glúteos arriba'},
+    ],
+    full:[
+      {nombre:'Wall Push-up',series:1,reps:'10',tempo:'2-1-2',descanso:'—',nota:'Circuito x3 rondas'},
+      {nombre:'Glute Bridge',series:1,reps:'12',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Row en Mesa',series:1,reps:'8',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Step-up',series:1,reps:'8 c/l',tempo:'2-0-2',descanso:'90s/ronda',nota:'Descanso entre rondas completas'},
+    ]
+  },
+  2: { name:'Construcción', desc:'Más repeticiones y variaciones. Tu cuerpo se adapta.',
+    push:[
+      {nombre:'Push-up Completo',series:3,reps:'8',tempo:'2-1-2',descanso:'60s',nota:'Si no puedes, rodillas'},
+      {nombre:'Pike Push-up',series:3,reps:'10',tempo:'2-1-2',descanso:'75s',nota:'Más rango de movimiento'},
+      {nombre:'Dips en Silla',series:4,reps:'10',tempo:'2-0-2',descanso:'60s',nota:'+1 serie, +2 reps'},
+      {nombre:'Diamond Push-up Rodillas',series:3,reps:'6',tempo:'2-1-2',descanso:'75s',nota:'Énfasis en tríceps'},
+    ],
+    pull:[
+      {nombre:'Row Invertido',series:4,reps:'10',tempo:'2-1-2',descanso:'75s',nota:'+1 serie +2 reps'},
+      {nombre:'Chin-up Negativo',series:3,reps:'6',tempo:'5s bajada',descanso:'90s',nota:'Control total'},
+      {nombre:'Superman Y-Raise',series:3,reps:'12',tempo:'3s hold',descanso:'60s',nota:'Brazos en Y'},
+    ],
+    legs:[
+      {nombre:'Sentadilla (sin asistencia)',series:4,reps:'15',tempo:'2-1-2',descanso:'60s',nota:'Profundidad completa'},
+      {nombre:'Wall Sit',series:3,reps:'30s',tempo:'Hold',descanso:'60s',nota:'+10s'},
+      {nombre:'Step-up',series:4,reps:'12 c/l',tempo:'2-0-2',descanso:'60s',nota:'Más volumen'},
+      {nombre:'Calf Raises',series:3,reps:'20',tempo:'2-1-2',descanso:'45s',nota:'+5 reps'},
+      {nombre:'Hip Thrust en Suelo',series:3,reps:'15',tempo:'2-2-2',descanso:'60s',nota:'Pausa 2s arriba'},
+    ],
+    full:[
+      {nombre:'Push-up',series:1,reps:'10',tempo:'2-1-2',descanso:'—',nota:'Circuito x4 rondas'},
+      {nombre:'Hip Thrust',series:1,reps:'12',tempo:'2-2-2',descanso:'—',nota:''},
+      {nombre:'Row Invertido',series:1,reps:'8',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Step-up',series:1,reps:'10 c/l',tempo:'2-0-2',descanso:'75s/ronda',nota:''},
+    ]
+  },
+  3: { name:'Intermedio', desc:'Ejercicios más demandantes. El progreso es visible.',
+    push:[
+      {nombre:'Push-up',series:4,reps:'12',tempo:'2-1-2',descanso:'60s',nota:'Forma perfecta'},
+      {nombre:'Pike Push-up Elevado',series:3,reps:'10',tempo:'2-1-2',descanso:'75s',nota:'Pies en silla'},
+      {nombre:'Diamond Push-up',series:3,reps:'8',tempo:'2-1-2',descanso:'75s',nota:'Completo'},
+      {nombre:'Dips Profundos',series:4,reps:'10',tempo:'2-1-2',descanso:'60s',nota:'Más rango'},
+      {nombre:'Pseudo Push-up',series:2,reps:'6',tempo:'2-1-2',descanso:'90s',nota:'Manos giradas, core fuerte'},
+    ],
+    pull:[
+      {nombre:'Chin-up (completo)',series:3,reps:'3-5',tempo:'2-1-2',descanso:'120s',nota:'¡Tu primera dominada!'},
+      {nombre:'Row Invertido Pies Elevados',series:4,reps:'10',tempo:'2-1-2',descanso:'75s',nota:'Más difícil'},
+      {nombre:'Archer Row (asistido)',series:3,reps:'6 c/l',tempo:'2-1-2',descanso:'75s',nota:'Un brazo trabaja más'},
+    ],
+    legs:[
+      {nombre:'Sentadilla Profunda',series:4,reps:'15',tempo:'3-1-2',descanso:'60s',nota:'Abajo de paralelo'},
+      {nombre:'Zancada Caminando',series:3,reps:'10 c/l',tempo:'2-0-2',descanso:'60s',nota:'Paso largo'},
+      {nombre:'Sentadilla Búlgara',series:3,reps:'8 c/l',tempo:'2-1-2',descanso:'75s',nota:'Pie atrás en silla'},
+      {nombre:'Calf Raises (una pierna)',series:3,reps:'12 c/l',tempo:'2-1-2',descanso:'45s',nota:''},
+      {nombre:'Hip Thrust (una pierna)',series:3,reps:'10 c/l',tempo:'2-2-2',descanso:'60s',nota:'Progresión unilateral'},
+    ],
+    full:[
+      {nombre:'Push-up',series:1,reps:'12',tempo:'2-1-2',descanso:'—',nota:'Circuito x4'},
+      {nombre:'Chin-up Negativo',series:1,reps:'5',tempo:'4s',descanso:'—',nota:''},
+      {nombre:'Sentadilla Búlgara',series:1,reps:'8 c/l',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Dips',series:1,reps:'10',tempo:'2-0-2',descanso:'60s/ronda',nota:''},
+    ]
+  },
+  4: { name:'Fuerza', desc:'Holds más largos, menos reps, más intensidad.',
+    push:[
+      {nombre:'Push-up Archer',series:3,reps:'6 c/l',tempo:'2-1-2',descanso:'90s',nota:'Un brazo asiste al otro'},
+      {nombre:'Handstand Hold (pared)',series:3,reps:'20s',tempo:'Hold',descanso:'120s',nota:'Fuerza de hombros'},
+      {nombre:'Dips Profundos',series:4,reps:'12',tempo:'2-1-2',descanso:'60s',nota:'Rango completo'},
+      {nombre:'Diamond Push-up',series:4,reps:'12',tempo:'2-1-2',descanso:'60s',nota:'Dominio total'},
+      {nombre:'Pike Push-up Deficit',series:3,reps:'8',tempo:'2-1-2',descanso:'90s',nota:'Manos en libros/bloques'},
+    ],
+    pull:[
+      {nombre:'Pull-up',series:4,reps:'5-8',tempo:'2-1-2',descanso:'120s',nota:'Agarre prono'},
+      {nombre:'Chin-up',series:3,reps:'6-8',tempo:'2-1-2',descanso:'90s',nota:'Supino'},
+      {nombre:'Archer Row',series:3,reps:'8 c/l',tempo:'2-1-2',descanso:'75s',nota:'Control total'},
+    ],
+    legs:[
+      {nombre:'Pistol Squat (asistido)',series:3,reps:'5 c/l',tempo:'3-1-2',descanso:'90s',nota:'Agárrate de algo'},
+      {nombre:'Sentadilla Búlgara',series:4,reps:'10 c/l',tempo:'2-1-2',descanso:'75s',nota:'Profundo'},
+      {nombre:'Zancada con Salto',series:3,reps:'8 c/l',tempo:'explosivo',descanso:'75s',nota:'Potencia'},
+      {nombre:'Calf Raises (una pierna)',series:4,reps:'15 c/l',tempo:'2-2-2',descanso:'45s',nota:'Pausa arriba'},
+      {nombre:'Nordic Curl (negativo)',series:3,reps:'5',tempo:'5s bajada',descanso:'90s',nota:'Solo excéntrico'},
+    ],
+    full:[
+      {nombre:'Push-up Archer',series:1,reps:'6 c/l',tempo:'2-1-2',descanso:'—',nota:'Circuito x4'},
+      {nombre:'Pull-up',series:1,reps:'5',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Sentadilla Búlgara',series:1,reps:'8 c/l',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Nordic Curl Neg.',series:1,reps:'4',tempo:'5s',descanso:'75s/ronda',nota:''},
+    ]
+  },
+  5: { name:'Avanzado', desc:'Movimientos complejos. Tu cuerpo es tu gimnasio.',
+    push:[
+      {nombre:'One Arm Push-up (elevado)',series:3,reps:'5 c/l',tempo:'2-1-2',descanso:'90s',nota:'Mano en banco'},
+      {nombre:'Handstand Push-up (pared)',series:3,reps:'5',tempo:'2-1-2',descanso:'120s',nota:'Rango parcial OK'},
+      {nombre:'Dips Lastrados (mochila)',series:4,reps:'8',tempo:'2-1-2',descanso:'90s',nota:'Usa mochila con peso'},
+      {nombre:'Planche Lean',series:3,reps:'15s',tempo:'Hold',descanso:'90s',nota:'Inclínate al frente en push-up'},
+      {nombre:'Explosive Push-up',series:3,reps:'8',tempo:'Explosivo',descanso:'90s',nota:'Despega las manos'},
+    ],
+    pull:[
+      {nombre:'Pull-up',series:4,reps:'8-10',tempo:'2-1-2',descanso:'90s',nota:'Dominio'},
+      {nombre:'Muscle-up Negativo',series:3,reps:'3',tempo:'5s',descanso:'120s',nota:'Control en la bajada'},
+      {nombre:'Archer Pull-up',series:3,reps:'4 c/l',tempo:'2-1-2',descanso:'120s',nota:'Asistido OK'},
+      {nombre:'Front Lever Tuck Hold',series:3,reps:'10s',tempo:'Hold',descanso:'90s',nota:'Rodillas al pecho'},
+    ],
+    legs:[
+      {nombre:'Pistol Squat',series:3,reps:'5 c/l',tempo:'3-1-2',descanso:'90s',nota:'Sin asistencia'},
+      {nombre:'Sentadilla Salto',series:4,reps:'10',tempo:'Explosivo',descanso:'75s',nota:'Máxima altura'},
+      {nombre:'Nordic Curl',series:3,reps:'5',tempo:'3-1-3',descanso:'90s',nota:'Concéntrico + excéntrico'},
+      {nombre:'Shrimp Squat (asistido)',series:3,reps:'5 c/l',tempo:'3-1-2',descanso:'90s',nota:'Pierna atrás'},
+      {nombre:'Calf Raises Explosivos',series:3,reps:'20',tempo:'Explosivo',descanso:'45s',nota:'Salto pequeño'},
+    ],
+    full:[
+      {nombre:'Handstand Push-up',series:1,reps:'5',tempo:'2-1-2',descanso:'—',nota:'Circuito x4'},
+      {nombre:'Pull-up',series:1,reps:'8',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Pistol Squat',series:1,reps:'5 c/l',tempo:'3-1-2',descanso:'—',nota:''},
+      {nombre:'Dips',series:1,reps:'10',tempo:'2-1-2',descanso:'60s/ronda',nota:''},
+    ]
+  },
+  6: { name:'Élite', desc:'Has llegado a un nivel superior. Mantén y perfecciona.',
+    push:[
+      {nombre:'One Arm Push-up',series:3,reps:'5 c/l',tempo:'2-1-2',descanso:'90s',nota:'En el suelo'},
+      {nombre:'Handstand Push-up (completo)',series:4,reps:'6',tempo:'2-1-2',descanso:'120s',nota:'Rango completo'},
+      {nombre:'Planche Push-up (tuck)',series:3,reps:'5',tempo:'2-1-2',descanso:'120s',nota:'Rodillas al pecho'},
+      {nombre:'Clap Push-up',series:3,reps:'10',tempo:'Explosivo',descanso:'75s',nota:'Aplauso arriba'},
+      {nombre:'Ring Dips (o parallettes)',series:4,reps:'10',tempo:'2-1-2',descanso:'90s',nota:'Estabilidad máxima'},
+    ],
+    pull:[
+      {nombre:'Muscle-up',series:3,reps:'3-5',tempo:'Explosivo',descanso:'120s',nota:'Transición limpia'},
+      {nombre:'Archer Pull-up',series:4,reps:'5 c/l',tempo:'2-1-2',descanso:'90s',nota:'Control'},
+      {nombre:'Front Lever Hold',series:3,reps:'10s',tempo:'Hold',descanso:'120s',nota:'Cuerpo recto'},
+      {nombre:'Weighted Pull-up',series:3,reps:'5',tempo:'2-1-2',descanso:'120s',nota:'Mochila con peso'},
+    ],
+    legs:[
+      {nombre:'Pistol Squat',series:4,reps:'8 c/l',tempo:'2-1-2',descanso:'75s',nota:'Dominio total'},
+      {nombre:'Shrimp Squat',series:3,reps:'6 c/l',tempo:'3-1-2',descanso:'90s',nota:'Sin asistencia'},
+      {nombre:'Nordic Curl',series:4,reps:'8',tempo:'2-1-2',descanso:'90s',nota:'Concéntrico completo'},
+      {nombre:'Box Jump',series:4,reps:'8',tempo:'Explosivo',descanso:'75s',nota:'Aterriza suave'},
+      {nombre:'Single Leg Glute Bridge',series:3,reps:'15 c/l',tempo:'2-2-2',descanso:'45s',nota:''},
+    ],
+    full:[
+      {nombre:'Muscle-up o Pull-up',series:1,reps:'5',tempo:'2-1-2',descanso:'—',nota:'Circuito x5 rondas'},
+      {nombre:'Handstand Push-up',series:1,reps:'5',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Pistol Squat',series:1,reps:'5 c/l',tempo:'2-1-2',descanso:'—',nota:''},
+      {nombre:'Planche Lean',series:1,reps:'15s',tempo:'Hold',descanso:'60s/ronda',nota:''},
+    ]
+  }
+};
+
+const PILATES_DB = {
+  1: { name:'Fundamentos', desc:'Respiración, activación de core profundo, movilidad básica.',
+    core:[
+      {nombre:'Respiración Diafragmática',series:1,reps:'3 min',tempo:'—',descanso:'—',nota:'Inhala expandiendo abdomen, exhala contrayendo'},
+      {nombre:'Dead Bug',series:3,reps:'8 c/l',tempo:'Lento',descanso:'60s',nota:'⚠️ Lumbar PEGADA al piso'},
+      {nombre:'Bird Dog',series:3,reps:'10 c/l',tempo:'3s hold',descanso:'60s',nota:'No rotar cadera'},
+      {nombre:'Plancha en Rodillas',series:3,reps:'20s',tempo:'Hold',descanso:'60s',nota:'Línea recta'},
+      {nombre:'Cat-Cow',series:1,reps:'10',tempo:'Lento',descanso:'—',nota:'Movilidad espinal'},
+      {nombre:'Posición de Niño',series:1,reps:'1 min',tempo:'Hold',descanso:'—',nota:'Estiramiento de cierre'},
+    ],
+    flex:[
+      {nombre:'Roll Down de Pared',series:3,reps:'8',tempo:'Lento',descanso:'45s',nota:'Vértebra por vértebra'},
+      {nombre:'Pelvic Curl',series:3,reps:'10',tempo:'2-2-2',descanso:'45s',nota:'Articulación espinal'},
+      {nombre:'Spine Twist Sentado',series:3,reps:'8 c/l',tempo:'Lento',descanso:'45s',nota:'Crecer antes de girar'},
+      {nombre:'Side Lying Leg Lift',series:3,reps:'12 c/l',tempo:'2-1-2',descanso:'45s',nota:'Cadera estable'},
+      {nombre:'Stretch: Psoas',series:1,reps:'30s c/l',tempo:'Hold',descanso:'—',nota:'Rodilla en suelo'},
+    ],
+    full:[
+      {nombre:'Hundred (modificado)',series:1,reps:'50 pulsos',tempo:'Rítmico',descanso:'60s',nota:'Cabeza abajo si molesta cuello'},
+      {nombre:'Single Leg Stretch',series:3,reps:'8 c/l',tempo:'Fluido',descanso:'45s',nota:'Core activado'},
+      {nombre:'Swimming (suave)',series:3,reps:'10 c/l',tempo:'Lento',descanso:'45s',nota:'Extensión controlada'},
+      {nombre:'Leg Circle',series:3,reps:'8 c/l',tempo:'Controlado',descanso:'45s',nota:'Cadera quieta'},
+      {nombre:'Shell Stretch',series:1,reps:'1 min',tempo:'Hold',descanso:'—',nota:'Relajación'},
+    ]
+  },
+  2: { name:'Desarrollo', desc:'Mayor control, tiempos de hold más largos.',
+    core:[
+      {nombre:'Dead Bug (piernas extendidas)',series:3,reps:'10 c/l',tempo:'Lento',descanso:'60s',nota:'Progresión'},
+      {nombre:'Bird Dog con Pausa',series:3,reps:'10 c/l',tempo:'5s hold',descanso:'60s',nota:'Más tiempo arriba'},
+      {nombre:'Plancha Completa',series:3,reps:'30s',tempo:'Hold',descanso:'60s',nota:'Desde los pies'},
+      {nombre:'Side Plank (rodillas)',series:3,reps:'20s c/l',tempo:'Hold',descanso:'60s',nota:'Lateral'},
+      {nombre:'Toe Taps',series:3,reps:'12 c/l',tempo:'Controlado',descanso:'45s',nota:'Lumbar pegada'},
+    ],
+    flex:[
+      {nombre:'Roll Up',series:3,reps:'8',tempo:'Lento',descanso:'60s',nota:'Articulando la columna'},
+      {nombre:'Spine Stretch Forward',series:3,reps:'8',tempo:'Lento',descanso:'45s',nota:'Crecer y flexionar'},
+      {nombre:'Mermaid Stretch',series:3,reps:'6 c/l',tempo:'Fluido',descanso:'45s',nota:'Apertura lateral'},
+      {nombre:'Swan Prep',series:3,reps:'8',tempo:'2-1-2',descanso:'45s',nota:'Extensión torácica'},
+      {nombre:'Thread the Needle',series:3,reps:'8 c/l',tempo:'Lento',descanso:'45s',nota:'Rotación espinal'},
+    ],
+    full:[
+      {nombre:'Hundred',series:1,reps:'100 pulsos',tempo:'Rítmico',descanso:'60s',nota:'Serie completa'},
+      {nombre:'Double Leg Stretch',series:3,reps:'10',tempo:'Fluido',descanso:'45s',nota:'Extensión y recogida'},
+      {nombre:'Swimming',series:3,reps:'20s',tempo:'Rápido',descanso:'45s',nota:'Flutter rápido'},
+      {nombre:'Teaser Prep',series:3,reps:'6',tempo:'Lento',descanso:'60s',nota:'Piernas a 45°'},
+      {nombre:'Seal',series:1,reps:'8',tempo:'Divertido',descanso:'—',nota:'Masaje espinal'},
+    ]
+  },
+  3: { name:'Intermedio', desc:'Ejercicios clásicos del repertorio Pilates.',
+    core:[
+      {nombre:'Plancha Completa',series:3,reps:'45s',tempo:'Hold',descanso:'60s',nota:'+15s'},
+      {nombre:'Side Plank',series:3,reps:'25s c/l',tempo:'Hold',descanso:'60s',nota:'Desde los pies'},
+      {nombre:'Roll Over',series:3,reps:'6',tempo:'Controlado',descanso:'60s',nota:'Piernas sobre cabeza'},
+      {nombre:'Criss-Cross',series:3,reps:'12 c/l',tempo:'Controlado',descanso:'45s',nota:'Oblicuos'},
+      {nombre:'Leg Pull Front',series:3,reps:'8 c/l',tempo:'2-1-2',descanso:'60s',nota:'Plancha + levanta pie'},
+    ],
+    flex:[
+      {nombre:'Roll Up Completo',series:4,reps:'10',tempo:'Fluido',descanso:'45s',nota:'Sin impulso'},
+      {nombre:'Saw',series:3,reps:'8 c/l',tempo:'Fluido',descanso:'45s',nota:'Rotación + flexión'},
+      {nombre:'Swan Dive',series:3,reps:'6',tempo:'Dinámico',descanso:'60s',nota:'Balanceo controlado'},
+      {nombre:'Kneeling Side Kick',series:3,reps:'10 c/l',tempo:'2-1-2',descanso:'45s',nota:'Balance lateral'},
+      {nombre:'Spine Twist',series:3,reps:'10 c/l',tempo:'Fluido',descanso:'45s',nota:'Sentado, piernas extendidas'},
+    ],
+    full:[
+      {nombre:'Hundred',series:1,reps:'100',tempo:'Rítmico',descanso:'—',nota:'Piernas a 45°'},
+      {nombre:'Teaser',series:3,reps:'8',tempo:'Controlado',descanso:'60s',nota:'V completa'},
+      {nombre:'Swimming',series:3,reps:'30s',tempo:'Rápido',descanso:'45s',nota:'Velocidad'},
+      {nombre:'Side Kick Series',series:3,reps:'10 c/l',tempo:'Controlado',descanso:'45s',nota:'Front, side, circles'},
+      {nombre:'Control Balance',series:3,reps:'6 c/l',tempo:'Lento',descanso:'60s',nota:'Coordinación'},
+    ]
+  },
+  4: { name:'Avanzado I', desc:'Mayor exigencia, transiciones fluidas.',
+    core:[
+      {nombre:'Plancha Dinámica',series:3,reps:'30s',tempo:'Fluido',descanso:'60s',nota:'Cambios de posición'},
+      {nombre:'Side Plank con Rotación',series:3,reps:'8 c/l',tempo:'Controlado',descanso:'60s',nota:'Thread the needle'},
+      {nombre:'Jackknife',series:3,reps:'8',tempo:'Controlado',descanso:'75s',nota:'Fuerza abdominal pura'},
+      {nombre:'Hip Circles',series:3,reps:'6 c/l',tempo:'Lento',descanso:'60s',nota:'Piernas arriba, circular'},
+      {nombre:'Scissors Aerial',series:3,reps:'12 c/l',tempo:'Fluido',descanso:'45s',nota:'Piernas en tijera'},
+    ],
+    flex: [
+      {nombre:'Swan Dive Full',series:3,reps:'8',tempo:'Dinámico',descanso:'60s',nota:'Balanceo amplio'},
+      {nombre:'Boomerang',series:3,reps:'6',tempo:'Fluido',descanso:'75s',nota:'Secuencia completa'},
+      {nombre:'Twist Avanzado',series:3,reps:'8 c/l',tempo:'Controlado',descanso:'45s',nota:'Máxima rotación'},
+      {nombre:'Rocking',series:3,reps:'8',tempo:'Dinámico',descanso:'60s',nota:'Extensión + balanceo'},
+      {nombre:'Mermaid con Rotación',series:3,reps:'8 c/l',tempo:'Fluido',descanso:'45s',nota:'Lateral + giro'},
+    ],
+    full:[
+      {nombre:'Hundred (piernas bajas)',series:1,reps:'100',tempo:'Rítmico',descanso:'—',nota:'Piernas a 30°'},
+      {nombre:'Teaser III',series:3,reps:'6',tempo:'Controlado',descanso:'75s',nota:'Brazos y piernas simultáneos'},
+      {nombre:'Star Side Plank',series:3,reps:'15s c/l',tempo:'Hold',descanso:'60s',nota:'Estrella'},
+      {nombre:'Push-up Pilates',series:3,reps:'8',tempo:'Fluido',descanso:'60s',nota:'Roll down + push-up'},
+      {nombre:'Seal Avanzado',series:1,reps:'10',tempo:'Fluido',descanso:'—',nota:'Clap 3 veces'},
+    ]
+  },
+  5: { name:'Avanzado II', desc:'Dominio del cuerpo. Flow continuo.',
+    core:[
+      {nombre:'Plancha a Pike',series:4,reps:'10',tempo:'Controlado',descanso:'60s',nota:'Flexión de cadera'},
+      {nombre:'Side Plank Leg Lift',series:3,reps:'10 c/l',tempo:'2-1-2',descanso:'60s',nota:'Pierna arriba'},
+      {nombre:'Control Balance',series:3,reps:'8 c/l',tempo:'Lento',descanso:'75s',nota:'Máximo control'},
+      {nombre:'Corkscrew',series:3,reps:'8 c/l',tempo:'Controlado',descanso:'60s',nota:'Piernas circulan'},
+      {nombre:'Plank to Push-up',series:3,reps:'10',tempo:'Fluido',descanso:'60s',nota:'Antebrazos a manos'},
+    ],
+    flex:[
+      {nombre:'High Scissors',series:3,reps:'10 c/l',tempo:'Fluido',descanso:'45s',nota:'Piernas altas'},
+      {nombre:'Twist Completo',series:3,reps:'10 c/l',tempo:'Fluido',descanso:'45s',nota:'Rotación máxima'},
+      {nombre:'Swan Pull',series:3,reps:'8',tempo:'Dinámico',descanso:'60s',nota:'Brazos traccionan'},
+      {nombre:'Leg Pull Back',series:3,reps:'8 c/l',tempo:'2-1-2',descanso:'60s',nota:'Supino + pierna'},
+      {nombre:'Full Spine Stretch',series:3,reps:'8',tempo:'Lento',descanso:'45s',nota:'Máxima flexión'},
+    ],
+    full:[
+      {nombre:'Flow: Hundred-Roll Up-Roll Over',series:1,reps:'1 ciclo',tempo:'Fluido',descanso:'—',nota:'Sin parar'},
+      {nombre:'Flow: Single-Double Leg Stretch',series:1,reps:'10 cada',tempo:'Fluido',descanso:'—',nota:''},
+      {nombre:'Flow: Spine Stretch-Saw-Twist',series:1,reps:'8 cada',tempo:'Fluido',descanso:'—',nota:''},
+      {nombre:'Flow: Swimming-Superman-Child',series:1,reps:'20s cada',tempo:'Fluido',descanso:'60s',nota:''},
+      {nombre:'Teaser Full',series:3,reps:'8',tempo:'Controlado',descanso:'60s',nota:'Dominio'},
+    ]
+  },
+  6: { name:'Maestría', desc:'Ejercicios de élite y flujo avanzado. Eres un experto.',
+    core:[
+      {nombre:'V-Sit Hold',series:3,reps:'20s',tempo:'Hold',descanso:'75s',nota:'Balance en glúteos'},
+      {nombre:'Dragon Flag (parcial)',series:3,reps:'5',tempo:'3-1-3',descanso:'90s',nota:'Core de acero'},
+      {nombre:'Plank Walk-out',series:3,reps:'10',tempo:'Controlado',descanso:'60s',nota:'Caminar con manos'},
+      {nombre:'L-Sit Hold',series:3,reps:'15s',tempo:'Hold',descanso:'75s',nota:'En el suelo'},
+      {nombre:'Side Plank Hip Dips',series:3,reps:'12 c/l',tempo:'Controlado',descanso:'45s',nota:'Toca y sube'},
+    ],
+    flex:[
+      {nombre:'Full Roll Up + Twist',series:4,reps:'10',tempo:'Fluido',descanso:'45s',nota:'Combinado'},
+      {nombre:'Boomerang Avanzado',series:3,reps:'8',tempo:'Fluido',descanso:'60s',nota:'Transición limpia'},
+      {nombre:'Standing Pilates Series',series:3,reps:'10 c/l',tempo:'Controlado',descanso:'45s',nota:'De pie'},
+      {nombre:'Star Roll',series:3,reps:'6 c/l',tempo:'Fluido',descanso:'60s',nota:'Estrella + roll'},
+      {nombre:'Spine Corrector Flow',series:1,reps:'5 min',tempo:'Fluido',descanso:'—',nota:'Secuencia completa'},
+    ],
+    full:[
+      {nombre:'Classical Mat Flow (30 min)',series:1,reps:'1 sesión',tempo:'Fluido',descanso:'—',nota:'Todos los ejercicios clásicos'},
+      {nombre:'Advanced Series: Teaser-Boomerang-Seal',series:1,reps:'1 ciclo',tempo:'Fluido',descanso:'—',nota:''},
+      {nombre:'Control Series',series:1,reps:'1 ciclo',tempo:'Fluido',descanso:'—',nota:'Balance y control'},
+      {nombre:'Final Stretch',series:1,reps:'5 min',tempo:'Lento',descanso:'—',nota:'Cierre consciente'},
+    ]
+  }
+};
+
+/* ═══════════════════════════════════════
+   KETO MEALS (Rotating weekly)
+═══════════════════════════════════════ */
+const KETO_MEALS = [
+  {
+    desayuno:{nombre:'Huevos Revueltos con Aguacate',desc:'3 huevos revueltos en mantequilla con ½ aguacate, queso rallado y sal rosa.',f:32,p:21,c:4},
+    comida:{nombre:'Pollo al Horno con Brócoli',desc:'Muslo de pollo al horno con brócoli salteado en aceite de oliva y ajo. Ensalada verde.',f:28,p:35,c:6},
+    cena:{nombre:'Salmón con Espárragos',desc:'Filete de salmón al horno con espárragos en mantequilla y limón.',f:30,p:32,c:3},
+    snack:{nombre:'Nueces de Macadamia (30g)',f:22,p:2,c:1}
+  },
+  {
+    desayuno:{nombre:'Omelette de Espinaca y Queso',desc:'3 huevos, espinacas frescas, queso mozzarella. Cocinar en aceite de coco.',f:30,p:24,c:3},
+    comida:{nombre:'Carne Molida con Calabacín',desc:'Carne molida (80/20) salteada con calabacín en espiral, salsa de tomate baja en azúcar.',f:32,p:30,c:5},
+    cena:{nombre:'Ensalada César Keto',desc:'Lechuga romana, pollo asado, parmesano, aderezo César casero (sin azúcar).',f:26,p:28,c:4},
+    snack:{nombre:'Queso Cheddar (40g) + Pepino',f:14,p:10,c:2}
+  },
+  {
+    desayuno:{nombre:'Bulletproof Coffee + Tocino',desc:'Café con mantequilla y aceite MCT. 3 tiras de tocino crujiente.',f:38,p:12,c:0},
+    comida:{nombre:'Tacos en Hoja de Lechuga',desc:'Carne asada en hojas de lechuga con guacamole, crema agria y queso.',f:34,p:28,c:5},
+    cena:{nombre:'Camarones al Ajillo',desc:'Camarones salteados en mantequilla con ajo, chile y perejil. Acompañar con ensalada.',f:24,p:30,c:3},
+    snack:{nombre:'Almendras (30g)',f:15,p:6,c:2}
+  },
+  {
+    desayuno:{nombre:'Yogur Griego (sin azúcar) con Nueces',desc:'Yogur griego entero, nueces pecanas, una cucharada de aceite de coco.',f:28,p:18,c:5},
+    comida:{nombre:'Hamburguesa sin Pan',desc:'Carne de res 80/20, queso, lechuga, tomate, aguacate, mostaza. Sin pan.',f:36,p:32,c:4},
+    cena:{nombre:'Pechuga de Pollo Rellena',desc:'Rellena con queso crema y espinacas, envuelta en tocino al horno.',f:32,p:35,c:3},
+    snack:{nombre:'Aceitunas (10 unidades)',f:10,p:1,c:1}
+  },
+  {
+    desayuno:{nombre:'Huevos Benedictinos Keto',desc:'2 huevos pochados sobre tocino con salsa holandesa (mantequilla, yema, limón).',f:36,p:20,c:2},
+    comida:{nombre:'Bowl de Atún y Aguacate',desc:'Atún en aceite, aguacate, pepino, semillas de sésamo, salsa soya.',f:30,p:28,c:4},
+    cena:{nombre:'Chuleta de Cerdo con Coliflor',desc:'Chuleta a la plancha con puré de coliflor (con crema y mantequilla).',f:28,p:32,c:5},
+    snack:{nombre:'Queso Crema con Apio',f:12,p:4,c:2}
+  },
+  {
+    desayuno:{nombre:'Pancakes Keto de Queso Crema',desc:'2 huevos + 60g queso crema batidos. Cocinar como pancakes. Mantequilla encima.',f:30,p:18,c:2},
+    comida:{nombre:'Ensalada de Pollo con Aguacate',desc:'Pollo desmenuzado, aguacate, tocino, queso azul, aderezo ranch casero.',f:34,p:30,c:4},
+    cena:{nombre:'Costillas BBQ (sin azúcar)',desc:'Costillas con salsa BBQ keto (tomate, vinagre, especias, sin azúcar). Ensalada verde.',f:30,p:28,c:5},
+    snack:{nombre:'Huevo Duro + Sal',f:5,p:6,c:0}
+  },
+  {
+    desayuno:{nombre:'Smoothie Keto Verde',desc:'Espinaca, aguacate, leche de coco, proteína en polvo, hielo.',f:24,p:22,c:4},
+    comida:{nombre:'Fajitas de Res en Lechuga',desc:'Tiras de res con pimiento, cebolla (poca), crema agria, en hojas de lechuga.',f:30,p:32,c:6},
+    cena:{nombre:'Pescado Blanco con Mantequilla de Ajo',desc:'Tilapia o mero en mantequilla de ajo y hierbas. Ejotes salteados.',f:26,p:30,c:4},
+    snack:{nombre:'Semillas de Girasol (30g)',f:14,p:6,c:3}
+  }
+];
+
+const ALLOWED_FOODS = [
+  '🥩 Carne de Res','🍗 Pollo','🐟 Salmón','🦐 Camarones','🥓 Tocino',
+  '🐷 Cerdo','🥚 Huevos','🧀 Queso','🥑 Aguacate','🫒 Aceite de Oliva',
+  '🧈 Mantequilla','🥥 Aceite de Coco','🥬 Espinacas','🥦 Brócoli','🥒 Pepino',
+  '🫑 Pimiento Verde','🍄 Champiñones','🥜 Nueces','🫘 Almendras','🧅 Cebolla (poca)',
+  '🧄 Ajo','🍋 Limón','🫐 Moras (pocas)','☕ Café Negro','🫖 Té sin azúcar',
+  '💧 Agua','🥛 Crema para batir','🧀 Queso Crema'
+];
+
+const FORBIDDEN_FOODS = [
+  '🍞 Pan','🍝 Pasta','🍚 Arroz','🌽 Maíz','🥔 Papa',
+  '🍬 Azúcar','🍫 Chocolate c/azúcar','🍰 Postres','🥤 Refrescos','🍺 Cerveza',
+  '🍌 Plátano','🍊 Naranja','🍇 Uvas','🍎 Manzana','🫘 Frijoles',
+  '🍯 Miel','🥣 Cereal','🥛 Leche (mucha)','🧃 Jugos','🍕 Pizza'
+];
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+let ST = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || {
+  profile: { name:'Champii', weight:152, height:182, goal:95 },
+  days: {},
+};
+let calMonth = new Date().getMonth();
+let calYear = new Date().getFullYear();
+let weightChart = null;
+let exChart = null;
+
+function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(ST)); }
+
+/* ═══════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════ */
+function getDayNumber(date){
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const s = new Date(START_DATE.getFullYear(), START_DATE.getMonth(), START_DATE.getDate());
+  return Math.floor((d - s) / 86400000) + 1;
+}
+
+function getPhase(dayNum){
+  const month = Math.floor((dayNum - 1) / 30);
+  if(month < 2) return 1;
+  if(month < 4) return 2;
+  if(month < 6) return 3;
+  if(month < 8) return 4;
+  if(month < 10) return 5;
+  return 6;
+}
+
+function getPhaseName(p){ return CALISTHENICS[p]?.name || 'Fundamentos'; }
+
+function getDayType(dayNum){
+  const dayOfWeek = ((dayNum - 1) % 7);
+  // Mon=0: Pilates Core, Tue=1: Calisthenics Push, Wed=2: Pilates Flex,
+  // Thu=3: Calisthenics Pull+Legs, Fri=4: Pilates Full, Sat=5: Calisthenics Full, Sun=6: Rest
+  const types = ['pilates-core','calisthenics-push','pilates-flex','calisthenics-pull','pilates-full','calisthenics-full','rest'];
+  const labels = ['🧘 Pilates Core','💪 Calistenia Empuje','🧘 Pilates Flex','💪 Calistenia Jalón+Pierna','🧘 Pilates Full Body','💪 Calistenia Full Body','😴 Descanso Activo'];
+  const colors = ['purple','primary','purple','orange','purple','success','teal'];
+  return { type: types[dayOfWeek], label: labels[dayOfWeek], color: colors[dayOfWeek], dayOfWeek };
+}
+
+function getExercisesForDay(dayNum){
+  const phase = getPhase(dayNum);
+  const dt = getDayType(dayNum);
+  const warmup = {nombre:'🔥 Calentamiento — Movilidad 5 min',series:'-',reps:'5 min',tempo:'—',descanso:'—',nota:'Círculos articulares, Cat-Cow',isSec:true};
+  const cooldown = {nombre:'❄️ Enfriamiento — Estiramiento 5 min',series:'-',reps:'5 min',tempo:'—',descanso:'—',nota:'Respiración y estiramiento',isSec:true};
+
+  let exercises = [];
+  if(dt.type === 'rest'){
+    exercises = [
+      {nombre:'Caminata suave',series:'1',reps:'25 min',tempo:'Moderado',descanso:'—',nota:'Terreno plano, sin prisa'},
+      {nombre:'Dead Bug (mantenimiento)',series:'2',reps:'6 c/l',tempo:'Lento',descanso:'60s',nota:'Activación suave'},
+      {nombre:'Respiración Diafragmática',series:'1',reps:'5 min',tempo:'—',descanso:'—',nota:'Core profundo'},
+    ];
+  } else if(dt.type.startsWith('pilates')){
+    const pdb = PILATES_DB[phase];
+    if(dt.type === 'pilates-core') exercises = pdb.core;
+    else if(dt.type === 'pilates-flex') exercises = pdb.flex;
+    else exercises = pdb.full;
+  } else {
+    const cdb = CALISTHENICS[phase];
+    if(dt.type === 'calisthenics-push') exercises = cdb.push;
+    else if(dt.type === 'calisthenics-pull') exercises = [...cdb.pull, ...cdb.legs.slice(0,2)];
+    else exercises = cdb.full;
+  }
+
+  if(dt.type !== 'rest'){
+    return [warmup, ...exercises, cooldown];
+  }
+  return exercises;
+}
+
+function getBMI(w, h){ return w && h ? (w / ((h/100)**2)).toFixed(1) : '—'; }
+function getBMICategory(bmi){
+  bmi = parseFloat(bmi);
+  if(isNaN(bmi)) return {label:'—',color:'text3'};
+  if(bmi < 18.5) return {label:'Bajo peso',color:'warning'};
+  if(bmi < 25) return {label:'Normal',color:'success'};
+  if(bmi < 30) return {label:'Sobrepeso',color:'warning'};
+  if(bmi < 35) return {label:'Obesidad I',color:'orange'};
+  if(bmi < 40) return {label:'Obesidad II',color:'danger'};
+  return {label:'Obesidad III',color:'danger'};
+}
+
+function getMealForDay(dayNum){
+  return KETO_MEALS[(dayNum - 1) % KETO_MEALS.length];
+}
+
+/* ═══════════════════════════════════════
+   VIEW SYSTEM
+═══════════════════════════════════════ */
+const viewTitles = {
+  dashboard: 'Dashboard',
+  calendar: 'Calendario Anual',
+  exercises: 'Calistenia — Peso Corporal',
+  pilates: 'Pilates & Estabilidad',
+  nutrition: 'Dieta Keto',
+  progress: 'Progreso & Avances',
+  profile: 'Perfil'
+};
+
+function showView(id){
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('v-'+id)?.classList.add('active');
+  document.querySelector(`[data-view="${id}"]`)?.classList.add('active');
+  document.getElementById('topTitle').textContent = viewTitles[id] || id;
+  closeSidebar();
+  if(id === 'dashboard') renderDashboard();
+  if(id === 'calendar') renderCalendar();
+  if(id === 'exercises') renderExercises();
+  if(id === 'pilates') renderPilates();
+  if(id === 'nutrition') renderNutrition();
+  if(id === 'progress') renderProgress();
+  if(id === 'profile') renderProfile();
+}
+
+/* ═══════════════════════════════════════
+   SIDEBAR MOBILE
+═══════════════════════════════════════ */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+function renderDashboard(){
+  const today = new Date();
+  const dayNum = getDayNumber(today);
+  const phase = getPhase(dayNum > 0 ? dayNum : 1);
+  const dt = getDayType(dayNum > 0 ? dayNum : 1);
+  const w = ST.profile.weight;
+  const h = ST.profile.height;
+  const bmi = getBMI(w, h);
+  const bmiCat = getBMICategory(bmi);
+
+  // Stats
+  let completedDays = 0, totalEx = 0, streak = 0, tempStreak = 0;
+  const latestWeight = getLatestWeight();
+
+  for(let i = 1; i <= Math.min(dayNum, 365); i++){
+    const dd = ST.days[i];
+    if(dd && dd.completed){
+      completedDays++;
+      tempStreak++;
+      streak = Math.max(streak, tempStreak);
+    } else if(i < dayNum) {
+      tempStreak = 0;
+    }
+    if(dd && dd.checks){
+      totalEx += Object.values(dd.checks).filter(v => v === 'done').length;
+    }
+  }
+
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card" style="--stat-color:var(--primary)">
+      <div class="stat-icon" style="background:var(--primary-light);color:var(--primary)">📅</div>
+      <div class="stat-val">${dayNum > 0 ? dayNum : '—'}</div>
+      <div class="stat-label">Día del plan</div>
+      <div class="stat-change" style="color:var(--primary)">Fase ${phase}: ${getPhaseName(phase)}</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--success)">
+      <div class="stat-icon" style="background:var(--success-light);color:var(--success)">✅</div>
+      <div class="stat-val">${completedDays}</div>
+      <div class="stat-label">Días completados</div>
+      <div class="stat-change" style="color:var(--success)">${totalEx} ejercicios hechos</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--warning)">
+      <div class="stat-icon" style="background:var(--warning-light);color:var(--warning)">🔥</div>
+      <div class="stat-val">${streak}</div>
+      <div class="stat-label">Mejor racha</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--purple)">
+      <div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">⚖️</div>
+      <div class="stat-val">${latestWeight || w || '—'}</div>
+      <div class="stat-label">Peso actual (kg)</div>
+      <div class="stat-change" style="color:var(--purple)">IMC: ${bmi}</div>
+    </div>
+  `;
+
+  // Today's Routine
+  document.getElementById('todayTypeBadge').textContent = dt.label;
+  const exercises = getExercisesForDay(dayNum > 0 ? dayNum : 1);
+  const dd = ST.days[dayNum] || {};
+  const checks = dd.checks || {};
+  const realExercises = exercises.filter(e => !e.isSec);
+  const doneCount = Object.values(checks).filter(v => v === 'done').length;
+  const firstUndone = realExercises.findIndex((e,i) => checks[`ex_${i}`] !== 'done' && checks[`ex_${i}`] !== 'skip');
+
+  document.getElementById('todayRoutine').innerHTML = buildExerciseList(exercises, dayNum > 0 ? dayNum : 1, firstUndone);
+
+  // BMI
+  document.getElementById('bmiDisplay').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:42px;font-weight:900;color:var(--${bmiCat.color})">${bmi}</div>
+      <div style="font-size:12px;color:var(--${bmiCat.color});font-weight:700;margin-top:4px">${bmiCat.label}</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">${w} kg · ${h} cm</div>
+      ${ST.profile.goal ? `<div style="font-size:11px;color:var(--text3);margin-top:2px">Meta: ${ST.profile.goal} kg</div>` :''}
+    </div>
+  `;
+
+  // Macros
+  const meal = getMealForDay(dayNum > 0 ? dayNum : 1);
+  const totF = meal.desayuno.f + meal.comida.f + meal.cena.f + meal.snack.f;
+  const totP = meal.desayuno.p + meal.comida.p + meal.cena.p + meal.snack.p;
+  const totC = meal.desayuno.c + meal.comida.c + meal.cena.c + meal.snack.c;
+  document.getElementById('dashMacros').innerHTML = `
+    <div class="macro-item" style="background:var(--orange-light)">
+      <div class="macro-val" style="color:var(--orange)">${totF}g</div>
+      <div class="macro-label">Grasas</div><div class="macro-pct">~70%</div>
+    </div>
+    <div class="macro-item" style="background:var(--primary-light)">
+      <div class="macro-val" style="color:var(--primary)">${totP}g</div>
+      <div class="macro-label">Proteína</div><div class="macro-pct">~25%</div>
+    </div>
+    <div class="macro-item" style="background:var(--success-light)">
+      <div class="macro-val" style="color:var(--success)">${totC}g</div>
+      <div class="macro-label">Carbs</div><div class="macro-pct">~5%</div>
+    </div>
+  `;
+
+  // Streak
+  document.getElementById('streakDisplay').innerHTML = `
+    <div style="text-align:center">
+      <div style="font-size:42px;font-weight:900;color:var(--warning)">${streak}</div>
+      <div style="font-size:12px;color:var(--text3)">días consecutivos</div>
+      <div style="margin-top:12px;height:6px;background:var(--bg);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${Math.min(streak/7*100,100)}%;background:linear-gradient(90deg,var(--warning),var(--orange));border-radius:99px;transition:width .5s ease"></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);margin-top:4px">${streak}/7 para la semana</div>
+    </div>
+  `;
+}
+
+function getLatestWeight(){
+  let latest = null;
+  for(let i = 365; i >= 1; i--){
+    if(ST.days[i]?.weight){
+      latest = ST.days[i].weight;
+      break;
+    }
+  }
+  return latest;
+}
+
+/* ═══════════════════════════════════════
+   EXERCISE LIST BUILDER
+═══════════════════════════════════════ */
+function buildExerciseList(exercises, dayNum, highlightIdx = -1){
+  const checks = ST.days[dayNum]?.checks || {};
+  let realIdx = 0;
+  return '<div class="exercise-list">' + exercises.map((ex, i) => {
+    if(ex.isSec){
+      return `<div style="padding:8px 14px;background:var(--bg);border-radius:var(--radius-sm);font-size:12px;font-weight:700;color:var(--text2)">${ex.nombre}</div>`;
+    }
+    const key = `ex_${realIdx}`;
+    const status = checks[key] || '';
+    const isCurrent = realIdx === highlightIdx && !status;
+    const cls = status === 'done' ? 'completed' : status === 'skip' ? 'skipped' : isCurrent ? 'current' : '';
+    const checkIcon = status === 'done' ? '✓' : status === 'skip' ? '✗' : '';
+    const html = `
+      <div class="ex-item ${cls}" id="exItem-${dayNum}-${realIdx}">
+        <div class="ex-check" onclick="toggleExercise(${dayNum},${realIdx})">${checkIcon}</div>
+        <div class="ex-body">
+          <div class="ex-name">${ex.nombre}</div>
+          <div class="ex-detail">
+            <span>📊 ${ex.series} series</span>
+            <span>🔄 ${ex.reps}</span>
+            <span>⏱ ${ex.tempo}</span>
+            ${ex.descanso !== '—' && ex.descanso !== '-' ? `<span>😮‍💨 ${ex.descanso}</span>` : ''}
+          </div>
+          ${ex.nota ? `<div class="ex-note">${ex.nota}</div>` : ''}
+        </div>
+      </div>`;
+    realIdx++;
+    return html;
+  }).join('') + '</div>';
+}
+
+/* ═══════════════════════════════════════
+   TOGGLE EXERCISE
+═══════════════════════════════════════ */
+function toggleExercise(dayNum, idx){
+  if(!ST.days[dayNum]) ST.days[dayNum] = { checks:{} };
+  if(!ST.days[dayNum].checks) ST.days[dayNum].checks = {};
+  const key = `ex_${idx}`;
+  const cur = ST.days[dayNum].checks[key];
+
+  if(!cur){
+    ST.days[dayNum].checks[key] = 'done';
+    showCongratsForExercise(dayNum, idx);
+  } else if(cur === 'done'){
+    ST.days[dayNum].checks[key] = 'skip';
+    toast('⏭️ Ejercicio saltado');
+  } else {
+    delete ST.days[dayNum].checks[key];
+    toast('↩️ Marcado deshecho');
+  }
+
+  // Check if all done
+  const exercises = getExercisesForDay(dayNum).filter(e => !e.isSec);
+  const checks = ST.days[dayNum].checks;
+  const doneCount = Object.values(checks).filter(v => v === 'done').length;
+  if(doneCount >= exercises.length){
+    ST.days[dayNum].completed = true;
+  } else {
+    ST.days[dayNum].completed = false;
+  }
+
+  save();
+  // Re-render the view we're on
+  const activeView = document.querySelector('.view.active')?.id;
+  if(activeView === 'v-dashboard') renderDashboard();
+  else if(activeView === 'v-exercises') renderExercises();
+  else if(activeView === 'v-pilates') renderPilates();
+}
+
+function showCongratsForExercise(dayNum, idx){
+  const exercises = getExercisesForDay(dayNum).filter(e => !e.isSec);
+  const checks = ST.days[dayNum]?.checks || {};
+  const doneCount = Object.values(checks).filter(v => v === 'done').length;
+  const total = exercises.length;
+
+  if(doneCount >= total){
+    // All done!
+    showModal('🏆','¡Rutina Completada!',`Increíble trabajo, ${ST.profile.name}! Has terminado los ${total} ejercicios del día. ¡Descansa y recupérate!`, null);
+  } else {
+    // Find next
+    const nextIdx = exercises.findIndex((e,i) => !checks[`ex_${i}`]);
+    const nextName = nextIdx >= 0 ? exercises[nextIdx].nombre : null;
+
+    const phrases = [
+      `¡Gran esfuerzo, ${ST.profile.name}! 💪`,
+      `¡Sigue así, ${ST.profile.name}! 🔥`,
+      `¡Excelente forma, ${ST.profile.name}! ⚡`,
+      `¡Eso es, ${ST.profile.name}! 🎯`,
+      `¡Imparable, ${ST.profile.name}! 🚀`,
+    ];
+    const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+    toast(`✅ ${phrase} (${doneCount}/${total})`);
+
+    if(nextName){
+      showModal('💪', phrase, `Ejercicio ${doneCount}/${total} completado.`, `▶ Siguiente: ${nextName}`);
+    }
+  }
+}
+
+function showModal(emoji, title, text, next){
+  document.getElementById('modalEmoji').textContent = emoji;
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalText').textContent = text;
+  const nextEl = document.getElementById('modalNext');
+  if(next){
+    nextEl.textContent = next;
+    nextEl.style.display = 'block';
+  } else {
+    nextEl.style.display = 'none';
+  }
+  document.getElementById('congratsModal').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('congratsModal').classList.remove('show');
+}
+
+/* ═══════════════════════════════════════
+   CALENDAR
+═══════════════════════════════════════ */
+function renderCalendar(){
+  const monthStr = MONTHS_ES[calMonth] + ' ' + calYear;
+  document.getElementById('calMonth').textContent = monthStr;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  const todayDay = getDayNumber(today);
+
+  let html = DAYS_ES.map(d => `<div class="cal-day-header">${d}</div>`).join('');
+  for(let i = 0; i < firstDay; i++) html += '<div class="cal-day empty"></div>';
+
+  for(let d = 1; d <= daysInMonth; d++){
+    const date = new Date(calYear, calMonth, d);
+    const dn = getDayNumber(date);
+    const isToday = date.toDateString() === today.toDateString();
+    const dt = dn > 0 ? getDayType(dn) : null;
+    const dd = ST.days[dn];
+    const isDone = dd?.completed;
+    const shortLabel = dt ? dt.label.split(' ').pop().substring(0,4) : '';
+    const typeColor = dt ? dt.color : 'text3';
+    html += `<div class="cal-day${isToday?' today':''}${isDone?' done':''}" onclick="selectCalDay(${dn},${calYear},${calMonth},${d})" title="Día ${dn > 0 ? dn : '—'}: ${dt?.label || ''}">
+      <span>${d}</span>
+      ${dn > 0 && dn <= 365 ? `<span class="cal-day-type" style="color:var(--${typeColor})">${shortLabel}</span>` : ''}
+    </div>`;
+  }
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function changeMonth(dir){
+  calMonth += dir;
+  if(calMonth > 11){ calMonth = 0; calYear++; }
+  if(calMonth < 0){ calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function selectCalDay(dayNum, y, m, d){
+  if(dayNum < 1 || dayNum > 365) return;
+  const dt = getDayType(dayNum);
+  const exercises = getExercisesForDay(dayNum);
+  const meal = getMealForDay(dayNum);
+  const phase = getPhase(dayNum);
+  const dd = ST.days[dayNum] || {};
+  const checks = dd.checks || {};
+  const realEx = exercises.filter(e => !e.isSec);
+  const firstUndone = realEx.findIndex((e,i) => checks[`ex_${i}`] !== 'done' && checks[`ex_${i}`] !== 'skip');
+
+  const detail = document.getElementById('calDayDetail');
+  detail.style.display = 'block';
+  document.getElementById('calDayContent').innerHTML = `
+    <div class="card-header">
+      <div class="card-title">📅 Día ${dayNum} — ${d} ${MONTHS_ES[m]} ${y}</div>
+      <span class="card-badge" style="background:var(--${dt.color === 'primary' ? 'primary-light' : dt.color + '-light'});color:var(--${dt.color})">${dt.label}</span>
+    </div>
+    <div style="margin-bottom:14px;font-size:12px;color:var(--text3)">Fase ${phase}: ${getPhaseName(phase)}</div>
+    ${buildExerciseList(exercises, dayNum, firstUndone)}
+    <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+      <div class="card-title" style="margin-bottom:10px">🥑 Comidas del Día</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.8">
+        <div>☀️ <strong>Desayuno:</strong> ${meal.desayuno.nombre}</div>
+        <div>🌤️ <strong>Comida:</strong> ${meal.comida.nombre}</div>
+        <div>🌙 <strong>Cena:</strong> ${meal.cena.nombre}</div>
+        <div>🥜 <strong>Snack:</strong> ${meal.snack.nombre}</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+      <div class="input-group" style="flex:1;min-width:120px;margin-bottom:0">
+        <label class="input-label">⚖️ Peso (kg)</label>
+        <input class="input-field" type="number" step="0.1" id="calW-${dayNum}" value="${dd.weight||''}" placeholder="kg" inputmode="decimal">
+      </div>
+      <div class="input-group" style="flex:1;min-width:120px;margin-bottom:0">
+        <label class="input-label">⚡ Energía (1-10)</label>
+        <input class="input-field" type="number" min="1" max="10" id="calE-${dayNum}" value="${dd.energy||''}" placeholder="7" inputmode="numeric">
+      </div>
+      <div class="input-group" style="flex:1;min-width:120px;margin-bottom:0">
+        <label class="input-label">😴 Sueño (1-10)</label>
+        <input class="input-field" type="number" min="1" max="10" id="calS-${dayNum}" value="${dd.sleep||''}" placeholder="8" inputmode="numeric">
+      </div>
+    </div>
+    <div class="input-group" style="margin-top:10px;margin-bottom:0">
+      <label class="input-label">📝 Notas</label>
+      <textarea class="input-field" id="calN-${dayNum}" rows="2" placeholder="¿Cómo te sentiste?">${dd.notes||''}</textarea>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="saveCalDay(${dayNum})">💾 Guardar</button>
+      <button class="btn btn-outline" onclick="clearCalDay(${dayNum})">🗑 Limpiar</button>
+    </div>
+  `;
+  detail.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function saveCalDay(dayNum){
+  if(!ST.days[dayNum]) ST.days[dayNum] = {checks:{}};
+  const w = document.getElementById(`calW-${dayNum}`)?.value;
+  const e = document.getElementById(`calE-${dayNum}`)?.value;
+  const s = document.getElementById(`calS-${dayNum}`)?.value;
+  const n = document.getElementById(`calN-${dayNum}`)?.value;
+  if(w) ST.days[dayNum].weight = parseFloat(w);
+  if(e) ST.days[dayNum].energy = parseInt(e);
+  if(s) ST.days[dayNum].sleep = parseInt(s);
+  ST.days[dayNum].notes = n || '';
+  save();
+  toast('💾 Registro guardado correctamente');
+  renderCalendar();
+}
+
+function clearCalDay(dayNum){
+  if(!confirm(`¿Limpiar registro del Día ${dayNum}?`)) return;
+  if(ST.days[dayNum]){
+    delete ST.days[dayNum].weight;
+    delete ST.days[dayNum].energy;
+    delete ST.days[dayNum].sleep;
+    ST.days[dayNum].notes = '';
+  }
+  save();
+  toast('🗑️ Registro limpiado');
+}
+
+/* ═══════════════════════════════════════
+   EXERCISES VIEW
+═══════════════════════════════════════ */
+function renderExercises(){
+  const today = new Date();
+  const dayNum = Math.max(getDayNumber(today), 1);
+  const phase = getPhase(dayNum);
+  const dt = getDayType(dayNum);
+
+  document.getElementById('exPhaseBadge').textContent = `Fase ${phase}: ${getPhaseName(phase)}`;
+  document.getElementById('exPhaseDesc').textContent = CALISTHENICS[phase].desc;
+
+  // Show today's exercises if it's a calisthenics day, else show next calisthenics day
+  let targetDay = dayNum;
+  let targetDT = dt;
+  if(!dt.type.startsWith('calisthenics')){
+    // Find next calisthenics day
+    for(let i = 1; i <= 7; i++){
+      const nd = dayNum + i;
+      const ndt = getDayType(nd);
+      if(ndt.type.startsWith('calisthenics')){
+        targetDay = nd;
+        targetDT = ndt;
+        break;
+      }
+    }
+  }
+
+  const exercises = getExercisesForDay(targetDay);
+  const dd = ST.days[targetDay] || {};
+  const checks = dd.checks || {};
+  const realEx = exercises.filter(e => !e.isSec);
+  const firstUndone = realEx.findIndex((e,i) => checks[`ex_${i}`] !== 'done' && checks[`ex_${i}`] !== 'skip');
+
+  document.getElementById('exercisePanel').innerHTML = `
+    <div class="routine-type" style="background:var(--primary-light);color:var(--primary)">${targetDT.label} — Día ${targetDay}</div>
+    ${targetDay !== dayNum ? `<div style="font-size:12px;color:var(--warning);margin-bottom:10px">⚠️ Hoy no es día de Calistenia. Mostrando el próximo: Día ${targetDay}</div>` : ''}
+    ${buildExerciseList(exercises, targetDay, firstUndone)}
+  `;
+}
+
+/* ═══════════════════════════════════════
+   PILATES VIEW
+═══════════════════════════════════════ */
+function renderPilates(){
+  const today = new Date();
+  const dayNum = Math.max(getDayNumber(today), 1);
+  const phase = getPhase(dayNum);
+  const dt = getDayType(dayNum);
+
+  document.getElementById('pilatesPhaseBadge').textContent = `Fase ${phase}: ${PILATES_DB[phase].name}`;
+  document.getElementById('pilatesPhaseDesc').textContent = PILATES_DB[phase].desc;
+
+  let targetDay = dayNum;
+  let targetDT = dt;
+  if(!dt.type.startsWith('pilates')){
+    for(let i = 1; i <= 7; i++){
+      const nd = dayNum + i;
+      const ndt = getDayType(nd);
+      if(ndt.type.startsWith('pilates')){
+        targetDay = nd;
+        targetDT = ndt;
+        break;
+      }
+    }
+  }
+
+  const exercises = getExercisesForDay(targetDay);
+  const dd = ST.days[targetDay] || {};
+  const checks = dd.checks || {};
+  const realEx = exercises.filter(e => !e.isSec);
+  const firstUndone = realEx.findIndex((e,i) => checks[`ex_${i}`] !== 'done' && checks[`ex_${i}`] !== 'skip');
+
+  document.getElementById('pilatesPanel').innerHTML = `
+    <div class="routine-type" style="background:var(--purple-light);color:var(--purple)">${targetDT.label} — Día ${targetDay}</div>
+    ${targetDay !== dayNum ? `<div style="font-size:12px;color:var(--warning);margin-bottom:10px">⚠️ Hoy no es día de Pilates. Mostrando el próximo: Día ${targetDay}</div>` : ''}
+    ${buildExerciseList(exercises, targetDay, firstUndone)}
+  `;
+}
+
+/* ═══════════════════════════════════════
+   NUTRITION VIEW
+═══════════════════════════════════════ */
+function renderNutrition(){
+  const today = new Date();
+  const dayNum = Math.max(getDayNumber(today), 1);
+  const meal = getMealForDay(dayNum);
+  const totF = meal.desayuno.f + meal.comida.f + meal.cena.f + meal.snack.f;
+  const totP = meal.desayuno.p + meal.comida.p + meal.cena.p + meal.snack.p;
+  const totC = meal.desayuno.c + meal.comida.c + meal.cena.c + meal.snack.c;
+  const totCal = totF*9 + totP*4 + totC*4;
+
+  document.getElementById('ketoMacros').innerHTML = `
+    <div class="macro-item" style="background:var(--orange-light)">
+      <div class="macro-val" style="color:var(--orange)">${totF}g</div>
+      <div class="macro-label">Grasas</div>
+      <div class="macro-pct">${(totF*9/totCal*100).toFixed(0)}% · ${totF*9} kcal</div>
+    </div>
+    <div class="macro-item" style="background:var(--primary-light)">
+      <div class="macro-val" style="color:var(--primary)">${totP}g</div>
+      <div class="macro-label">Proteína</div>
+      <div class="macro-pct">${(totP*4/totCal*100).toFixed(0)}% · ${totP*4} kcal</div>
+    </div>
+    <div class="macro-item" style="background:var(--success-light)">
+      <div class="macro-val" style="color:var(--success)">${totC}g</div>
+      <div class="macro-label">Carbs Netos</div>
+      <div class="macro-pct">${(totC*4/totCal*100).toFixed(0)}% · ${totC*4} kcal</div>
+    </div>
+  `;
+
+  const meals = [
+    {icon:'☀️',time:'Desayuno',data:meal.desayuno},
+    {icon:'🌤️',time:'Comida',data:meal.comida},
+    {icon:'🌙',time:'Cena',data:meal.cena},
+    {icon:'🥜',time:'Snack',data:meal.snack},
+  ];
+
+  document.getElementById('mealPlan').innerHTML = meals.map(m => `
+    <div class="meal-card">
+      <div class="meal-header">
+        <span style="font-size:18px">${m.icon}</span>
+        <div>
+          <div class="meal-time">${m.time}</div>
+          <div class="meal-name">${m.data.nombre}</div>
+        </div>
+      </div>
+      ${m.data.desc ? `<div class="meal-desc">${m.data.desc}</div>` : ''}
+      <div class="meal-macros">
+        <span class="meal-macro" style="background:var(--orange-light);color:var(--orange)">🔥 ${m.data.f}g grasa</span>
+        <span class="meal-macro" style="background:var(--primary-light);color:var(--primary)">💪 ${m.data.p}g prot</span>
+        <span class="meal-macro" style="background:var(--success-light);color:var(--success)">🌿 ${m.data.c}g carbs</span>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('allowedFoods').innerHTML = ALLOWED_FOODS.map(f => `<div class="food-tag allowed">${f}</div>`).join('');
+  document.getElementById('forbiddenFoods').innerHTML = FORBIDDEN_FOODS.map(f => `<div class="food-tag forbidden">${f}</div>`).join('');
+}
+
+/* ═══════════════════════════════════════
+   PROGRESS VIEW
+═══════════════════════════════════════ */
+function renderProgress(){
+  const today = new Date();
+  const dayNum = Math.max(getDayNumber(today), 1);
+
+  // Stats
+  let completedDays = 0, totalEx = 0, skippedEx = 0;
+  const weights = [];
+  const exData = [];
+
+  for(let i = 1; i <= Math.min(dayNum, 365); i++){
+    const dd = ST.days[i];
+    if(dd?.completed) completedDays++;
+    if(dd?.checks){
+      const done = Object.values(dd.checks).filter(v => v === 'done').length;
+      const skip = Object.values(dd.checks).filter(v => v === 'skip').length;
+      totalEx += done;
+      skippedEx += skip;
+      if(done > 0) exData.push({day:i, count:done});
+    }
+    if(dd?.weight) weights.push({day:i, weight:dd.weight});
+  }
+
+  document.getElementById('progressStats').innerHTML = `
+    <div class="stat-card" style="--stat-color:var(--success)">
+      <div class="stat-icon" style="background:var(--success-light);color:var(--success)">✅</div>
+      <div class="stat-val">${completedDays}</div>
+      <div class="stat-label">Días completados</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--primary)">
+      <div class="stat-icon" style="background:var(--primary-light);color:var(--primary)">💪</div>
+      <div class="stat-val">${totalEx}</div>
+      <div class="stat-label">Ejercicios hechos</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--danger)">
+      <div class="stat-icon" style="background:var(--danger-light);color:var(--danger)">⏭️</div>
+      <div class="stat-val">${skippedEx}</div>
+      <div class="stat-label">Ejercicios saltados</div>
+    </div>
+    <div class="stat-card" style="--stat-color:var(--purple)">
+      <div class="stat-icon" style="background:var(--purple-light);color:var(--purple)">📊</div>
+      <div class="stat-val">${dayNum}</div>
+      <div class="stat-label">Día actual</div>
+    </div>
+  `;
+
+  // Charts
+  if(weightChart) weightChart.destroy();
+  if(exChart) exChart.destroy();
+
+  const wCtx = document.getElementById('weightChart').getContext('2d');
+  weightChart = new Chart(wCtx, {
+    type:'line',
+    data:{
+      labels: weights.map(w => `D${w.day}`),
+      datasets:[{
+        label:'Peso (kg)',
+        data: weights.map(w => w.weight),
+        borderColor:'#7c3aed',
+        backgroundColor:'rgba(124,58,237,.1)',
+        fill:true,
+        tension:.4,
+        pointRadius:4,
+        pointBackgroundColor:'#7c3aed',
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:false, grid:{color:'#e2e8f0'}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+
+  const eCtx = document.getElementById('exChart').getContext('2d');
+  exChart = new Chart(eCtx, {
+    type:'bar',
+    data:{
+      labels: exData.map(e => `D${e.day}`),
+      datasets:[{
+        label:'Ejercicios',
+        data: exData.map(e => e.count),
+        backgroundColor:'#2563eb',
+        borderRadius:6,
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        y:{beginAtZero:true, grid:{color:'#e2e8f0'}, ticks:{stepSize:1}},
+        x:{grid:{display:false}}
+      }
+    }
+  });
+
+  // History
+  const entries = [];
+  for(let i = Math.min(dayNum, 365); i >= 1; i--){
+    const dd = ST.days[i];
+    if(!dd) continue;
+    const hasData = dd.completed || dd.weight || dd.notes || (dd.checks && Object.keys(dd.checks).length > 0);
+    if(!hasData) continue;
+    const dt = getDayType(i);
+    const done = dd.checks ? Object.values(dd.checks).filter(v => v === 'done').length : 0;
+    entries.push(`
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);margin-bottom:6px;cursor:pointer;transition:var(--trans)" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'" onclick="showView('calendar');setTimeout(()=>selectCalDay(${i},${Math.floor(i/365)+2026},0,1),300)">
+        <div>
+          <div style="font-size:12px;color:var(--primary);font-weight:600">DÍA ${i}</div>
+          <div style="font-size:11px;color:var(--text3)">${dt.label}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          ${done > 0 ? `<span class="card-badge" style="background:var(--success-light);color:var(--success)">${done} hechos</span>` : ''}
+          ${dd.weight ? `<span class="card-badge" style="background:var(--purple-light);color:var(--purple)">⚖️ ${dd.weight}kg</span>` : ''}
+          ${dd.completed ? `<span class="card-badge" style="background:var(--success-light);color:var(--success)">✅</span>` : ''}
+        </div>
+      </div>
+    `);
+    if(entries.length >= 20) break;
+  }
+  document.getElementById('historyList').innerHTML = entries.length
+    ? entries.join('')
+    : '<div style="text-align:center;color:var(--text3);padding:20px;font-style:italic">Sin registros aún. ¡Empieza hoy! 🚀</div>';
+}
+
+/* ═══════════════════════════════════════
+   PROFILE VIEW
+═══════════════════════════════════════ */
+function renderProfile(){
+  document.getElementById('profName').value = ST.profile.name || 'Champii';
+  document.getElementById('profWeight').value = ST.profile.weight || '';
+  document.getElementById('profHeight').value = ST.profile.height || '';
+  document.getElementById('profGoal').value = ST.profile.goal || '';
+
+  const w = ST.profile.weight;
+  const h = ST.profile.height;
+  const bmi = getBMI(w, h);
+  const cat = getBMICategory(bmi);
+
+  document.getElementById('profileBMI').innerHTML = `
+    <div style="text-align:center;padding:16px 0">
+      <div style="font-size:60px;font-weight:900;color:var(--${cat.color})">${bmi}</div>
+      <div style="font-size:16px;color:var(--${cat.color});font-weight:700;margin-top:6px">${cat.label}</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--text3);line-height:2">
+        Peso: ${w || '—'} kg<br>
+        Altura: ${h || '—'} cm<br>
+        Meta: ${ST.profile.goal || '—'} kg
+      </div>
+      <div style="margin-top:16px;height:8px;background:var(--bg);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${w && ST.profile.goal ? Math.max(0, Math.min(100, ((w - ST.profile.goal) / (w - ST.profile.goal + 1)) * 5)) : 0}%;background:linear-gradient(90deg,var(--success),var(--teal));border-radius:99px"></div>
+      </div>
+    </div>
+  `;
+
+  const today = new Date();
+  const dayNum = Math.max(getDayNumber(today), 1);
+  const records = Object.keys(ST.days).length;
+  document.getElementById('profStart').textContent = '13 Abril 2026';
+  document.getElementById('profDays').textContent = dayNum;
+  document.getElementById('profPhase').textContent = `${getPhase(dayNum)} — ${getPhaseName(getPhase(dayNum))}`;
+  document.getElementById('profRecords').textContent = records;
+
+  // Update username in sidebar
+  document.querySelector('.user-name').textContent = ST.profile.name || 'Champii';
+}
+
+function saveProfile(){
+  ST.profile.name = document.getElementById('profName').value || 'Champii';
+  ST.profile.weight = parseFloat(document.getElementById('profWeight').value) || null;
+  ST.profile.height = parseInt(document.getElementById('profHeight').value) || null;
+  ST.profile.goal = parseFloat(document.getElementById('profGoal').value) || null;
+  save();
+  document.querySelector('.user-name').textContent = ST.profile.name;
+  toast(`💾 Perfil guardado, ${ST.profile.name}!`);
+  renderProfile();
+}
+
+/* ═══════════════════════════════════════
+   EXPORT / IMPORT / SYNC
+═══════════════════════════════════════ */
+function exportData(){
+  const json = JSON.stringify(ST, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'champii_backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ Backup descargado');
+}
+
+function importData(e){
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(data.profile && data.days){ ST = data; save(); location.reload(); }
+      else toast('⚠️ Archivo inválido');
+    } catch{ toast('⚠️ Error al leer') }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function copySyncCode(){
+  const code = btoa(encodeURIComponent(JSON.stringify(ST)));
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(code).then(() => {
+      toast('📋 Código de sincronización copiado al portapapeles');
+    });
+  } else {
+    // Fallback
+    const ta = document.createElement('textarea');
+    ta.value = code; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('📋 Código copiado');
+  }
+
+  // Also offer to paste
+  const paste = prompt('Para IMPORTAR, pega aquí un código de sincronización (o cancela):');
+  if(paste && paste.length > 10){
+    try{
+      const data = JSON.parse(decodeURIComponent(atob(paste)));
+      if(data.profile && data.days){
+        ST = data; save(); location.reload();
+      } else toast('⚠️ Código inválido');
+    } catch{ toast('⚠️ Error al decodificar') }
+  }
+}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+function init(){
+  const today = new Date();
+  document.getElementById('topDate').textContent =
+    `${DAYS_FULL[today.getDay()]}, ${today.getDate()} de ${MONTHS_ES[today.getMonth()]} ${today.getFullYear()}`;
+
+  // Set initial calendar to current month
+  calMonth = today.getMonth();
+  calYear = today.getFullYear();
+
+  // Update user name
+  document.querySelector('.user-name').textContent = ST.profile.name || 'Champii';
+
+  renderDashboard();
+}
+
+init();
+</script>
+</body>
+</html>
